@@ -1,0 +1,20 @@
+{
+  "name": "lw-line",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "nodemon"
+  },
+  "author": "Ragland Asir",
+  "license": "ISC",
+  "dependencies": {
+    "dotenv": "^8.2.0",
+    "express": "^4.17.1",
+    "faunadb": "^2.10.0",
+    "rss-parser": "^3.7.3"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.1"
+  }
+}

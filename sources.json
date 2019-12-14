@@ -1,0 +1,12 @@
+[{
+    "title":"The Verge",
+    "rssLink":"https://www.theverge.com/rss/index.xml",
+    "siteLink" :"https://www.theverge.com/",
+    "topic":"tech"
+},{
+    "title":"BBC",
+    "rssLink":"https://feeds.bbci.co.uk/news/world/rss.xml",
+    "siteLink" :"https://www.bbc.com/",
+    "topic":"World News"
+}
+]
