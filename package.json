@@ -4,7 +4,10 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "nodemon"
+    "start": "node index.js",
+    "watch": "nodemon --ignore \"*.json\"",
+    "test": "mocha",
+    "test:coverage": "nyc mocha"
   },
   "author": "Ragland Asir",
   "license": "ISC",
@@ -12,9 +15,18 @@
     "dotenv": "^8.2.0",
     "express": "^4.17.1",
     "faunadb": "^2.10.0",
-    "rss-parser": "^3.7.3"
+    "metafetch": "^1.9.3",
+    "nanoid": "^2.0.1",
+    "rss-parser": "^3.7.6"
   },
   "devDependencies": {
-    "nodemon": "^2.0.1"
+    "chai": "*",
+    "chai-http": "^4.3.0",
+    "mocha": "*",
+    "nodemon": "^2.0.4",
+    "nyc": "^15.1.0"
+  },
+  "engines": {
+    "node": "12.x"
   }
 }
