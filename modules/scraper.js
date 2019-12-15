@@ -8,25 +8,51 @@ const path = require('path');
 
 // --------------- functions ----------
 
-async function getNewItems() {
-  const sources = JSON.parse(
-    fs.readFileSync(path.join(__dirname, '../sources.json'))
-  );
+function getNewItems(source) {
+  return new Promise((resolve, reject) => {
+    parser
+      .parseURL(source['rssLink'])
+      .then(rssData => {
+        let scrappedItems = rssData.items.map(item => ({
+          title: item.title,
+          description: item.contentSnippet,
+          topics: item.categories
+            ? [...item.categories, ...source.topics]
+            : [...source.topics],
+          source: source.title,
+          date: new Date(item.pubDate).toISOString(),
+          link: item.link
+        }));
+        db.getLastItem(source.title).then(lastItemDate => {
+          if (lastItemDate === '') {
+            // Return all items
+            console.log(`Returning all items for ${source.title}`);
 
-  for await (source of sources) {
-    parser.parseURL(source['rssLink']).then(d => {
-      console.log(`${JSON.stringify(d['items'][0]['title'])} <== d \n`);
-    });
+            resolve(scrappedItems);
+            return;
+          } else {
+            console.log('Returning some items');
+            // Return only items published after last item
 
-    db.getLastItem(source['title']).then(lastItem => {
-      console.log(`${lastItem} <== l\n\n`);
-      if (lastItem === '') {
-        // Add all new items
-      } else {
-      }
-    });
-  }
-}
+            let newItems = scrappedItems.filter(
+              item => new Date(item.date) > new Date(lastItemDate)
+              // newer date is bigger
+            );
+
+            console.log(
+              `Scraped ${newItems.length} new items for ${source.title}\n`
+            );
+
+            resolve(newItems);
+            return;
+          }
+        });
+      })
+      .catch(rssParseError => {
+        console.error(`${rssParseError} <== rssParseError \n`);
+      });
+  });
+} // end of function getNewItems
 
 // --------------- exports ----------
 module.exports = {

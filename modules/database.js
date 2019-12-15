@@ -29,9 +29,12 @@ function getLastItem(source) {
     client
       .query(
         q.Map(
-          q.Paginate(q.Match(q.Index('article_sort_by_date2'), source), {
-            size: 1
-          }),
+          q.Paginate(
+            q.Match(q.Index('article_sort_by_date_search_by_source'), source),
+            {
+              size: 1
+            }
+          ),
           q.Lambda(['source', 'ref'], q.Get(q.Var('ref')))
         )
       )
@@ -41,12 +44,15 @@ function getLastItem(source) {
           resolve('');
           return;
         } else {
-          resolve(ret['data'][0]['data']['title']);
+          resolve(ret['data'][0]['data']['date']);
+          console.log(
+            `${ret['data'][0]['data']['date']} <== Last date for ${source} \n\n`
+          );
           return;
         }
       })
       .catch(getLastItemError => {
-        console.log(`${getLastItemError} <== getLastItemError \n`);
+        console.error(`${getLastItemError} <== getLastItemError \n`);
       });
   });
 }
@@ -55,28 +61,43 @@ function addMultiple(newPosts) {
   // Convert date to Fauna date format
   newPosts = newPosts.map(post => {
     return new Promise((resolve, reject) => {
-      client.query(q.ToDate(post.date)).then(ret => {
-        resolve({
-          ...post,
-          date: ret.value
+      client
+        .query(q.Time(post.date))
+        .then(ret => {
+          resolve({
+            ...post,
+            date: ret.value
+          });
+        })
+        .catch(toDateError => {
+          console.log(`${toDateError} <== toDateError\n\n`);
         });
-      });
     });
   });
 
-  Promise.all(newPosts).then(mpmpmp => {
-    client.query(
-      q.Map(
-        mpmpmp,
-        q.Lambda(
-          'post',
-          q.Create(q.Collection('posts'), {
-            data: q.Var('post')
-          })
+  Promise.all(newPosts)
+    .then(mpmpmp => {
+      client.query(
+        q.Map(
+          mpmpmp,
+          q.Lambda(
+            'post',
+            q.Create(q.Collection('posts'), {
+              data: q.Var('post')
+            })
+          )
         )
+      );
+    })
+    .then(addMultipleQueryResult =>
+      console.log(`${addMultipleQueryResult} <== addMultipleQueryResult \n`)
+    )
+    .catch(addMultipleQueryError =>
+      console.error(
+        `${JSON.stringify(addMultipleQueryError)} <== addMultipleQueryError \n`
       )
     );
-  });
+
   //   client
   //     .query(
   //       q.Map(

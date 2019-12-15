@@ -5,43 +5,41 @@ const db = require('./modules/database');
 const scrapper = require('./modules/scraper');
 const app = express(); //.use(bodyParser.json());
 
-// --------------- functions ----------
-let muliplePosts = [
-  {
-    title: 'ss2 title1',
-    description: 'this is the first description',
-    date: '2008-11-11',
-    source: 'The Guardian'
-  },
-  {
-    title: 'spread check22 title 2 India',
-    description: 'this is the first description',
-    date: '2008-11-10',
-    source: 'The Hindu'
-  },
-  {
-    title: 'spreack chec2222 title33',
-    description: 'this is the first description',
-    date: '2015-01-05',
-    source: 'The Guardian'
-  }
-];
+const fs = require('fs');
+const path = require('path');
 
-//db.addMultiple(muliplePosts);
-
-// db.getLastItem('The Guardian').then(a => {
-//   console.log(`${JSON.stringify(a)} <== a \n`);
-// });
-
-function updatePosts() {}
-
-//scrapper.getNewItems();
-//updatePosts();
 // --------------- GET requests ----------
 
-app.get('/', (query, response) => response.end('G0T'));
+app.get('/', (query, response) => response.end('LW Line'));
 
-app.get('/cron', (query, respone) => {});
+app.get('/addNewItems', (query, respone) => {
+  // Gets hit at periodic intervals to add new items
+  respone.end('K');
+
+  const sources = JSON.parse(
+    fs.readFileSync(path.join(__dirname, './sources.json'))
+  );
+
+  for (const source of sources) {
+    scrapper
+      .getNewItems(source)
+      .then(newItems => {
+        if (newItems.length === 0) {
+          console.log(`N0t adding anything for ${source.title}`);
+        } else {
+          db.addMultiple(newItems);
+        }
+      })
+      .catch(cronError => {
+        console.log(`${cronError} <== cronError \n`);
+      });
+  }
+});
+
+app.get('/deleteOldItems', (query, respone) => {
+  // Gets hit at periodic intervals to delete old items
+  respone.end('❌❎❌');
+});
 
 app.listen(5151, () => {
   console.log('Running @ port 5151');

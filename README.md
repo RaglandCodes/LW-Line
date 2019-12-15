@@ -6,7 +6,10 @@ A RSS reader to help overcome information overload.
 - Node.js
 - [FaunaDB](https://fauna.com/)
 
+### What's new
+- Add actual information to DB
+- New source
 
 ### TODO
-- Add actual information to DB
-- 5 more sources
+- Delete old posts
+- 11 new sources

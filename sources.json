@@ -1,12 +1,49 @@
-[{
-    "title":"The Verge",
-    "rssLink":"https://www.theverge.com/rss/index.xml",
-    "siteLink" :"https://www.theverge.com/",
-    "topic":"tech"
-},{
-    "title":"BBC",
-    "rssLink":"https://feeds.bbci.co.uk/news/world/rss.xml",
-    "siteLink" :"https://www.bbc.com/",
-    "topic":"World News"
-}
+[
+  {
+    "title": "The Verge",
+    "rssLink": "https://www.theverge.com/rss/index.xml",
+    "siteLink": "https://www.theverge.com/",
+    "topics": ["tech"]
+  },
+  {
+    "title": "BBC",
+    "rssLink": "https://feeds.bbci.co.uk/news/world/rss.xml",
+    "siteLink": "https://www.bbc.com/",
+    "topics": ["news"]
+  },
+  {
+    "title": "Ars Technica",
+    "rssLink": "http://feeds.arstechnica.com/arstechnica/index",
+    "siteLink": "https://arstechnica.com",
+    "type": "text",
+    "topics": ["tech"]
+  },
+  {
+    "title": "The Next Web",
+    "rssLink": "http://feeds.feedburner.com/thenextweb",
+    "siteLink": "https://thenextweb.com/",
+    "type": "text",
+    "topics": ["tech"]
+  },
+  {
+    "title": "Aeon",
+    "about": "Aeon is a magazine of ideas and culture. Publishing in-depth essays, incisive articles, and a mix of original and curated videos",
+    "topics": ["magazine", "culture"],
+    "siteLink": "https://aeon.co/",
+    "rssLink": "https://aeon.co/feed.rss"
+  },
+  {
+    "title": "WIRED ",
+    "about": "WIRED is where tomorrow is realised",
+    "topics": ["magazine"],
+    "siteLink": "https://www.wired.com/",
+    "rssLink": "https://www.wired.com/feed/rss"
+  },
+  {
+    "title": "Futurism ",
+    "about": "Bringing you the world, the news, products, and narratives of tomorrow, today.",
+    "topics": ["sciene", "tech"],
+    "siteLink": "https://futurism.com/",
+    "rssLink": "https://futurism.com/feed"
+  }
 ]
