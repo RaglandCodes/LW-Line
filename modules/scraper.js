@@ -27,7 +27,7 @@ function getNewItems(source) {
           if (lastItemDate === '') {
             // Return all items
             console.log(`Returning all items for ${source.title}`);
-
+            //fs.writeFileSync(path.join(__dirname, `./temp_logs/${source.title}.json`), JSON.stringify(scrappedItems));
             resolve(scrappedItems);
             return;
           } else {
@@ -36,9 +36,9 @@ function getNewItems(source) {
 
             let newItems = scrappedItems.filter(
               item => new Date(item.date) > new Date(lastItemDate)
-              // newer date is bigger
+              // newer date is bigger (I guess)
             );
-
+            // fs.writeFileSync(path.join(__dirname, `./temp_logs/${source.title}.json`), JSON.stringify(newItems));
             console.log(
               `Scraped ${newItems.length} new items for ${source.title}\n`
             );
@@ -50,6 +50,8 @@ function getNewItems(source) {
       })
       .catch(rssParseError => {
         console.error(`${rssParseError} <== rssParseError \n`);
+        resolve([]);
+        return;
       });
   });
 } // end of function getNewItems

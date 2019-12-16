@@ -45,5 +45,76 @@
     "topics": ["sciene", "tech"],
     "siteLink": "https://futurism.com/",
     "rssLink": "https://futurism.com/feed"
+  },
+  {
+    "title": "freeCodeCamp ",
+    "about": "A nonprofit community that helps you learn to code by building projects.",
+    "topics": ["coding"],
+    "siteLink": "https://www.freecodecamp.org/news/",
+    "rssLink": "https://www.freecodecamp.org/news/rss/"
+  },
+  {
+    "title": "Smashing Magazine ",
+    "about": "Smashing Magazine delivers reliable, useful, but most importantly practical articles to web designers and developers.",
+    "topics": ["coding", "design", "web_design"],
+    "siteLink": "https://www.smashingmagazine.com/",
+    "rssLink": "https://www.smashingmagazine.com/feed"
+  },
+  {
+    "title": "TechCrunch",
+    "about": "Breaking technology news, analysis, and opinions from TechCrunch. Your number one guide for all things tech.",
+    "topics": ["news", "tech"],
+    "siteLink": "https://techcrunch.com/",
+    "rssLink": "http://feeds.feedburner.com/TechCrunch/"
+  },
+  {
+    "title": "Fast Company",
+    "about": "World’s leading business media brand, with an editorial focus on innovation in technology, leadership, world changing ideas, creativity, and design",
+    "topics": [],
+    "siteLink": "https://www.fastcompany.com",
+    "rssLink": "http://feeds.feedburner.com/fastcompany/headlines"
+  },
+  {
+    "title": "Adobe 99U",
+    "about": "A Creative Career Resource",
+    "topics": ["design"],
+    "siteLink": "https://99u.adobe.com/",
+    "rssLink": "http://feeds.feedburner.com/The99Percent"
+  },
+  {
+    "title": "The Atlantic",
+    "about": " Ideas that enlighten, challenge, and delight.",
+    "topics": [],
+    "siteLink": "https://www.theatlantic.com/world/",
+    "rssLink": "https://www.theatlantic.com/feed/all/"
+  },
+  {
+    "title": "The Week [UK]",
+    "about": "All you need to know about every thing that matters",
+    "topics": ["news"],
+    "siteLink": "https://theweek.com/",
+    "rssLink": "https://theweek.com/rss.xml"
+  },
+  {
+    "title": "CNET",
+    "about": "CNET is the world's leader in tech product reviews, news, prices, videos, forums, how-tos and more.",
+    "topics": ["news", "tech"],
+    "siteLink": "https://www.cnet.com/",
+    "rssLink": "https://www.cnet.com/rss/all/"
+  },
+  {
+    "title": "Vox",
+    "about": "General interest news site for the 21st century. Its mission is simple: Explain the news.",
+    "topics": ["news"],
+    "siteLink": "https://www.vox.com/",
+    "rssLink": "https://www.vox.com/rss/index.xml"
   }
 ]
+
+
+
+
+
+
+ 
+ 
