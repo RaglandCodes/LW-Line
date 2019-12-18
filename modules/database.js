@@ -97,9 +97,9 @@ function getLastItem(source) {
           return;
         } else {
           resolve(ret['data'][0]['data']['date']);
-          console.log(
-            `${ret['data'][0]['data']['date']} <== Last date for ${source} \n\n`
-          );
+          // console.log(
+          //   `${ret['data'][0]['data']['date']} <== Last date for ${source} \n\n`
+          // );
           return;
         }
       })
@@ -154,7 +154,7 @@ function addMultiple(newPosts) {
 function deleteOldItems() {
   //Paginate(Match(Index('articles_sort_by_date')), {size: 5})
   client
-    .query(q.Paginate(q.Match(q.Index('articles_sort_by_date')), { size: 17 }))
+    .query(q.Paginate(q.Match(q.Index('articles_sort_by_date')), { size: 22 }))
     .then(queryResult => {
       let fiveDaysAgo = new Date(new Date().setDate(new Date().getDate() - 5));
       let refsToDelete = queryResult.data

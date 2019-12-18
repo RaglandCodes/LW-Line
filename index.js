@@ -17,6 +17,11 @@ app.use(function(req, res, next) {
   next();
 });
 
+// const sources = JSON.parse(
+//   fs.readFileSync(path.join(__dirname, './sources.json'))
+// );
+
+// console.log(`${sources.length} <== sources.length\n\n`);
 // --------------- GET requests ----------
 
 app.get('/', (request, response) => {
@@ -30,6 +35,8 @@ app.get('/addNewItems', (query, respone) => {
   const sources = JSON.parse(
     fs.readFileSync(path.join(__dirname, './sources.json'))
   );
+
+  console.log(`${sources.length} <== sources.length\n\n`);
 
   for (const source of sources) {
     scrapper

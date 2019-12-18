@@ -7,10 +7,9 @@ A RSS reader to help overcome information overload.
 - [FaunaDB](https://fauna.com/)
 
 ### What's new
+- Gets meta data
 - Frontend can request date based on sources
 - Delete old posts
-- Add actual information to DB
-- New sources
 
 
 ### TODO
