@@ -13,30 +13,26 @@ const path = require('path');
 
 // --------------- functions ----------
 
-// function getFaunaDate(news_item) {
-//   return new Promise((resolve, reject) => {
-//     client.query(q.ToDate(news_item.date)).then(ret => {
-//       resolve({
-//         ...news_item,
-//         date: ret.value
-//       });
-//     });
-//   });
-// }
-
-function getItems(sources) {
+function getItems(sources, after) {
   //get the items from the databse to show to the user
 
-  console.log(`${sources} <== sources\n\n`);
   return new Promise((resolve, reject) => {
     let matchQueries = sources.map(source =>
       q.Match(q.Index('article_sort_by_date_search_by_source'), source)
     );
 
+    if (after.ref) {
+      console.log('Got after');
+    }
     client
       .query(
         q.Map(
-          q.Paginate(q.Union(matchQueries), { size: 11 }),
+          q.Paginate(q.Union(matchQueries), {
+            size: 9,
+            after: after.ref
+              ? [after.ts, q.Ref(q.Collection('posts'), after.ref)]
+              : []
+          }),
           q.Lambda(['source', 'ref'], q.Get(q.Var('ref')))
         )
       )
@@ -48,21 +44,29 @@ function getItems(sources) {
           JSON.stringify(ret)
         );
         console.log(`${ret.data.length} <== ret.data.length\n\n`);
-        // console.log(`${ret.data[0]} <== ret.data[0]\n\n`);
-        // console.log(
-        //   `${JSON.stringify(
-        //     JSON.parse(JSON.stringify(ret)).data[0]['ref']
-        //   )} <== ret.data[0]['ref']\n\n`
-        // );
 
-        resolve(
-          ret.data.map(item => ({
+        if (ret.data.length === 0) {
+          resolve('ERROR');
+          return;
+        }
+        let afterRef = ret['after'][1]['@ref']['id'];
+        resolve({
+          data: ret.data.map(item => ({
             id: item['ref']['@ref']['id'],
             title: item['data']['title'],
+            source: item['data']['source'],
             topics: [...item['data']['topics']],
-            link: item['data']['link']
-          }))
-        );
+            link: item['data']['link'],
+            image: item['data']['image'],
+            description: item['data']['description'],
+            metaDescription: item['data']['metaDescription'],
+            ampURL: item['data']['ampURL']
+          })),
+          after: {
+            ref: afterRef,
+            ts: ret['after'][0]
+          }
+        });
         return;
       })
       .catch(error => {
@@ -111,6 +115,9 @@ function getLastItem(source) {
 
 function addMultiple(newPosts) {
   // Convert date to Fauna date format
+
+  //console.log("Adding multiple");
+
   newPosts = newPosts.map(post => {
     return new Promise((resolve, reject) => {
       client
@@ -141,9 +148,9 @@ function addMultiple(newPosts) {
         )
       );
     })
-    .then(addMultipleQueryResult =>
-      console.log(`${addMultipleQueryResult} <== addMultipleQueryResult \n`)
-    )
+    // .then(addMultipleQueryResult =>
+    //   console.log(`${addMultipleQueryResult} <== addMultipleQueryResult \n`)
+    // )
     .catch(addMultipleQueryError =>
       console.error(
         `${JSON.stringify(addMultipleQueryError)} <== addMultipleQueryError \n`
@@ -154,9 +161,9 @@ function addMultiple(newPosts) {
 function deleteOldItems() {
   //Paginate(Match(Index('articles_sort_by_date')), {size: 5})
   client
-    .query(q.Paginate(q.Match(q.Index('articles_sort_by_date')), { size: 22 }))
+    .query(q.Paginate(q.Match(q.Index('articles_sort_by_date')), { size: 77 }))
     .then(queryResult => {
-      let fiveDaysAgo = new Date(new Date().setDate(new Date().getDate() - 5));
+      let fiveDaysAgo = new Date(new Date().setDate(new Date().getDate() - 0));
       let refsToDelete = queryResult.data
         .filter(item => new Date(item[0]) < fiveDaysAgo)
         .map(item => JSON.parse(JSON.stringify(item[1]))['@ref']['id']);

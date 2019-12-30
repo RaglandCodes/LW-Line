@@ -14,7 +14,6 @@ function getMeta(item) {
       item.link,
       {
         flags: {
-          images: false,
           language: false,
           title: false,
           links: false,
@@ -27,24 +26,18 @@ function getMeta(item) {
         }
       },
       (err, meta) => {
-        //fs.writeFileSync(path.join(__dirname, "./try.json"), JSON.stringify(meta))
         if (err == null) {
-          //console.log('Good metas');
-
           resolve({
             ...item,
-            metaData: {
-              ampURL: meta.ampURL,
-              description: meta.description,
-              image: meta.image
-            }
+            ampURL: meta.ampURL,
+            metaDescription: meta.description,
+            image: meta.image
           });
         } else {
           resolve({
             ...item
           });
-          //console.log(`${err} 👈 error in meta. Not adding meta data`);
-          // console.log(`${item.source} <== Bad meta source \n\n`);
+          console.log(`${item.source} <== Bad meta causing ${err} \n\n`);
         }
       }
     ); // end of fetch
@@ -61,9 +54,9 @@ function getNewItems(source) {
         if (lastItemDate === '') {
           newData = newData.items;
         } else {
-          newData = newData.items.filter(
-            item => new Date(item.date) > new Date(lastItemDate)
-          );
+          newData = newData.items.filter(item => {
+            return new Date(item.pubDate) > new Date(lastItemDate);
+          });
         }
 
         let scrappedItems = newData.map(item => ({

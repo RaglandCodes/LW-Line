@@ -17,11 +17,6 @@ app.use(function(req, res, next) {
   next();
 });
 
-// const sources = JSON.parse(
-//   fs.readFileSync(path.join(__dirname, './sources.json'))
-// );
-
-// console.log(`${sources.length} <== sources.length\n\n`);
 // --------------- GET requests ----------
 
 app.get('/', (request, response) => {
@@ -42,6 +37,7 @@ app.get('/addNewItems', (query, respone) => {
     scrapper
       .getNewItems(source)
       .then(newItems => {
+        console.count('Finished scrapping');
         if (newItems.length === 0) {
           console.log(`N0t adding anything for ${source.title}`);
         } else {
@@ -60,13 +56,34 @@ app.get('/deleteOldItems', (query, respone) => {
   db.deleteOldItems();
 });
 
+app.get('/getSources', (request, response) => {
+  let searchTerm = request.query.searchTerm;
+  const sources = JSON.parse(
+    fs.readFileSync(path.join(__dirname, './sources.json'))
+  );
+  let results = sources.filter(
+    source => source.title.indexOf(searchTerm) !== -1
+  );
+
+  response.send(results);
+});
+
+app.get('/singleItem', (request, response) => {});
+
+app.get('/previewSource', (request, respone) => {});
+
 app.get('/getItems', (request, response) => {
   // Gets hit from the front-end
 
   let subscriptions = request.query.subscriptions.split('AaNnDd');
-  console.log(`${subscriptions} <== subscriptions\n\n`);
+  let after = { ref: request.query.afterRef, ts: request.query.afterTs };
+  console.log(request.query.afterRef);
+  console.log(request.query.afterTs);
+
+  console.log(`${after} <== after\n\n`);
+
   //db.getItems(subscriptions);
-  db.getItems(subscriptions).then(responseData => {
+  db.getItems(subscriptions, after).then(responseData => {
     response.send(responseData);
   });
 });
@@ -74,3 +91,13 @@ app.get('/getItems', (request, response) => {
 app.listen(5151, () => {
   console.log('Running @ port 5151');
 });
+
+// This is to be able to remix on Glitch
+// https://glitch.com/~lw-line
+/*
+
+ const listener = app.listen(process.env.PORT, function() {
+  console.log("Your app is listening on port " + listener.address().port);
+ });
+
+//*/

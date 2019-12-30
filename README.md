@@ -2,18 +2,21 @@
 
 A RSS reader to help overcome information overload.
 
+[Remix on Glitch](https://glitch.com/~lw-line)
+
 ## Tech Stack
 - Node.js
 - [FaunaDB](https://fauna.com/)
 
 ### What's new
-- Gets meta data
-- Frontend can request date based on sources
-- Delete old posts
-
+- [Frontend](https://github.com/raglandcodes/lw-line-frontend)
+- Implement pagination with frontend
+- Search for sources
 
 ### TODO
-- Implement pagination with frontend
-- Frontend
+
+- Handle case with no after
 - Don't add articles older than 5 days
-- 4 new sources
+- More complex source searching 
+    - Convert to lower case
+    - Search topics and descriptions

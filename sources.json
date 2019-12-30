@@ -108,13 +108,47 @@
     "topics": ["news"],
     "siteLink": "https://www.vox.com/",
     "rssLink": "https://www.vox.com/rss/index.xml"
+  },
+  {
+    "title": "The Economist",
+    "about": "News and analysis with a global perspective",
+    "topics": ["news"],
+    "siteLink": "https://www.economist.com/briefing/rss.xml",
+    "rssLink": "https://www.economist.com/briefing/rss.xml"
+  },
+  {
+    "title": "Vice",
+    "about": "The Definitive Guide To An Uncertain World",
+    "topics": ["news"],
+    "siteLink": "https://www.vice.com/en_us ",
+    "rssLink": "https://www.vice.com/en_us/rss"
+  },
+  {
+    "title": "MIT Technology Review",
+    "about": "MIT Technology Review is first to report on important new technologies that will affect your organization, your career, your life.",
+    "topics": ["news", "tech"],
+    "siteLink": "https://www.technologyreview.com/",
+    "rssLink": "https://www.technologyreview.com/stories.rss"
+  },
+  {
+    "title": "The Wall Street Journal",
+    "about": "Coverage of breaking news and current headlines from the US and around the world",
+    "topics": ["news"],
+    "siteLink": "https://www.wsj.com/",
+    "rssLink": "https://feeds.a.dj.com/rss/RSSWorldNews.xml"
+  },
+  {
+    "title": "Surface",
+    "about": "Surface covers the worlds of architecture, art, design, fashion, and travel, with a focus on how these fields shape and are shaped by contemporary culture. ",
+    "topics": ["art", "design"],
+    "siteLink": "https://www.surfacemag.com/",
+    "rssLink": "https://www.surfacemag.com/feed/"
+  },
+  {
+    "title": "ProPublica",
+    "about": "An independent, non-profit newsroom that produces investigative journalism in the public interest.",
+    "topics": [ "investigative journalism "],
+    "siteLink": "https://www.propublica.org/",
+    "rssLink": "http://feeds.propublica.org/propublica/main"
   }
 ]
-
-
-
-
-
-
- 
- 
