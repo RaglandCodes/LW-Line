@@ -58,14 +58,50 @@ app.get('/deleteOldItems', (query, respone) => {
 
 app.get('/getSources', (request, response) => {
   let searchTerm = request.query.searchTerm;
-  const sources = JSON.parse(
-    fs.readFileSync(path.join(__dirname, './sources.json'))
-  );
-  let results = sources.filter(
-    source => source.title.indexOf(searchTerm) !== -1
-  );
+  // let searchTopic = request.query.searchTopic;
 
-  response.send(results);
+  // if (searchTopic) {
+  //   const sources = JSON.parse(
+  //     fs.readFileSync(path.join(__dirname, './sources.json'))
+  //   );
+
+  //   console.log(`${searchTopic} <== searchTopic\n\n`);
+
+  //   let selectedSources = sources.filter(source => source.topics.includes(searchTopic));
+
+  //   response.send(selectedSources);
+  // }
+
+  
+  if (searchTerm === 'I_N_I_T') {
+    console.log('ST' + searchTerm);
+    const sources = JSON.parse(
+      fs.readFileSync(path.join(__dirname, './sources.json'))
+    );
+
+    let sourceResponse = {
+      tech: sources.filter(source => source.topics.includes('tech')),
+      news: sources.filter(source => source.topics.includes('news')),
+      design: sources.filter(source => source.topics.includes('design'))
+    };
+    response.send(sourceResponse)
+  } else if (searchTerm) {
+    console.log('in search term');
+
+    const sources = JSON.parse(
+      fs.readFileSync(path.join(__dirname, './sources.json'))
+    );
+
+    let results = sources.filter(
+      source =>
+        source.title.toLowerCase().indexOf(searchTerm.toLowerCase()) !== -1
+    );
+    console.log(`${results} <== results\n\n`);
+
+    response.send(results);
+  } else {
+    response.end('ERROR');
+  }
 });
 
 app.get('/singleItem', (request, response) => {});
