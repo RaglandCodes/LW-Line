@@ -13,8 +13,14 @@ const path = require('path');
 
 // --------------- functions ----------
 
+function getItemByRef(id) {
+  return new Promise((resolve, reject) => {
+    client.query(q.Get(q.Ref(q.Collection('posts'), id))).then(ret => resolve(ret.data));
+  });
+}
+
 function getItems(sources, after) {
-  //get the items from the databse to show to the user
+  //get the items based by source from the databse to show to the user
 
   return new Promise((resolve, reject) => {
     let matchQueries = sources.map(source =>
@@ -28,10 +34,8 @@ function getItems(sources, after) {
       .query(
         q.Map(
           q.Paginate(q.Union(matchQueries), {
-            size: 9,
-            after: after.ref
-              ? [after.ts, q.Ref(q.Collection('posts'), after.ref)]
-              : []
+            size: 3,
+            after: after.ref ? [after.ts, q.Ref(q.Collection('posts'), after.ref)] : []
           }),
           q.Lambda(['source', 'ref'], q.Get(q.Var('ref')))
         )
@@ -39,10 +43,7 @@ function getItems(sources, after) {
       .then(ret => JSON.parse(JSON.stringify(ret)))
       .then(ret => {
         //console.log(`${JSON.stringify(ret)} <== getItems query ret\n\n`);
-        fs.writeFileSync(
-          path.join(__dirname, './aa.json'),
-          JSON.stringify(ret)
-        );
+        //fs.writeFileSync(path.join(__dirname, './aa.json'), JSON.stringify(ret));
         console.log(`${ret.data.length} <== ret.data.length\n\n`);
 
         if (ret.data.length === 0) {
@@ -78,19 +79,15 @@ function getItems(sources, after) {
 } // end of function getItems
 
 function getLastItem(source) {
-  //Get's the last added item so that only the new ones are added to the database
-  //Returns the last title for the given source
+  //Get's the last added item's date so that only the new ones are added to the database
 
   return new Promise((resolve, reject) => {
     client
       .query(
         q.Map(
-          q.Paginate(
-            q.Match(q.Index('article_sort_by_date_search_by_source'), source),
-            {
-              size: 1
-            }
-          ),
+          q.Paginate(q.Match(q.Index('article_sort_by_date_search_by_source'), source), {
+            size: 1
+          }),
           q.Lambda(['source', 'ref'], q.Get(q.Var('ref')))
         )
       )
@@ -108,7 +105,7 @@ function getLastItem(source) {
         }
       })
       .catch(getLastItemError => {
-        console.error(`${getLastItemError} <== getLastItemError \n`);
+        console.log(`${getLastItemError} <== getLastItemError for ${source}\n`);
       });
   });
 }
@@ -130,6 +127,7 @@ function addMultiple(newPosts) {
         })
         .catch(toDateError => {
           console.log(`${toDateError} <== toDateError\n\n`);
+          console.log(`${JSON.stringify(post, null, 2)} <= post causing error`);
         });
     });
   });
@@ -148,9 +146,7 @@ function addMultiple(newPosts) {
         )
       );
     })
-    // .then(addMultipleQueryResult =>
-    //   console.log(`${addMultipleQueryResult} <== addMultipleQueryResult \n`)
-    // )
+
     .catch(addMultipleQueryError =>
       console.error(
         `${JSON.stringify(addMultipleQueryError)} <== addMultipleQueryError \n`
@@ -173,10 +169,7 @@ function deleteOldItems() {
     })
     .then(refs => {
       return client.query(
-        q.Map(
-          refs,
-          q.Lambda('ref', q.Delete(q.Ref(q.Collection('posts'), q.Var('ref'))))
-        )
+        q.Map(refs, q.Lambda('ref', q.Delete(q.Ref(q.Collection('posts'), q.Var('ref')))))
       );
     })
     .then(deleteQueryRet => {
@@ -193,5 +186,6 @@ module.exports = {
   addMultiple: addMultiple,
   deleteOldItems: deleteOldItems,
   getLastItem: getLastItem,
-  getItems: getItems
+  getItems: getItems,
+  getItemByRef: getItemByRef
 };

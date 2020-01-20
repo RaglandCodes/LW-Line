@@ -44,92 +44,37 @@ function getMeta(item) {
   }); // end of return new promise
 } // end of function getMeta
 
-function getNewItems(source) {
-  return new Promise((resolve, reject) => {
-    Promise.all([
-      parser.parseURL(source['rssLink']),
-      db.getLastItem(source['title'])
-    ])
-      .then(([newData, lastItemDate]) => {
-        if (lastItemDate === '') {
-          newData = newData.items;
-        } else {
-          newData = newData.items.filter(item => {
-            return new Date(item.pubDate) > new Date(lastItemDate);
-          });
-        }
-
-        let scrappedItems = newData.map(item => ({
-          title: item.title,
-          description: item.contentSnippet,
-          topics: item.categories
-            ? [...item.categories, ...source.topics]
-            : [...source.topics],
-          source: source.title,
-          date: new Date(item.pubDate).toISOString(),
-          link: item.link
-        }));
-
-        return scrappedItems;
-      })
-      .then(withoutMetaData => {
-        withoutMetaData = withoutMetaData.map(item => getMeta(item));
-        Promise.all(withoutMetaData).then(withMetaData => {
-          resolve(withMetaData);
-        });
-      })
-      .catch(ae => console.log(`${ae} <== ae\n\n`));
+async function getNewItems(source) {
+  let [newData, lastItemDate] = await Promise.all([
+    parser.parseURL(source['rssLink']),
+    db.getLastItem(source['title'])
+  ]).catch(getNewItemsError => {
+    console.log(`${getNewItemsError} <= getNewItemsError ${source}`);
+    return [];
   });
 
-  // return new Promise((resolve, reject) => {
-  //   parser
-  //     .parseURL(source['rssLink'])
-  //     .then(rssData => {
-  //       let scrappedItems = rssData.items.map(item => ({
-  //         title: item.title,
-  //         description: item.contentSnippet,
-  //         topics: item.categories
-  //           ? [...item.categories, ...source.topics]
-  //           : [...source.topics],
-  //         source: source.title,
-  //         date: new Date(item.pubDate).toISOString(),
-  //         link: item.link
-  //       }));
+  if (lastItemDate === '') {
+    newData = newData.items;
+  } else {
+    newData = newData.items.filter(item => {
+      return new Date(item.pubDate) > new Date(lastItemDate);
+    });
+  }
 
-  //       db.getLastItem(source.title).then(lastItemDate => {
-  //         if (lastItemDate === '') {
-  //           // Return all items
-  //           console.log(`Returning all items for ${source.title}`);
+  let scrappedItems = newData.map(item => ({
+    title: item.title,
+    description: item.contentSnippet,
+    topics: item.categories ? [...item.categories, ...source.topics] : [...source.topics],
+    source: source.title,
+    date: new Date(item.pubDate).toISOString(),
+    link: item.link
+  }));
 
-  //           resolve(scrappedItems);
-  //           return;
+  let scrappedItemsWithMetaData = await Promise.all(
+    scrappedItems.map(item => getMeta(item))
+  );
 
-  //           return scrappedItems;
-  //         } else {
-  //           console.log('Returning some items');
-  //           // Return only items published after last item
-
-  //           let newItems = scrappedItems.filter(
-  //             item => new Date(item.date) > new Date(lastItemDate)
-  //             // newer date is bigger (I guess)
-  //           );
-  //           console.log(
-  //             `Scraped ${newItems.length} new items for ${source.title}\n`
-  //           );
-
-  //           resolve(newItems);
-  //           return;
-
-  //           // return newItems;
-  //         }
-  //       });
-  //     })
-  //     .catch(rssParseError => {
-  //       console.error(`${rssParseError} <== rssParseError \n`);
-  //       resolve([]);
-  //       return;
-  //     });
-  // });
+  return scrappedItemsWithMetaData;
 } // end of function getNewItems
 
 // --------------- exports ----------

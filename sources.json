@@ -33,28 +33,28 @@
     "rssLink": "https://aeon.co/feed.rss"
   },
   {
-    "title": "WIRED ",
+    "title": "WIRED",
     "about": "WIRED is where tomorrow is realised",
     "topics": ["magazine"],
     "siteLink": "https://www.wired.com/",
     "rssLink": "https://www.wired.com/feed/rss"
   },
   {
-    "title": "Futurism ",
+    "title": "Futurism",
     "about": "Bringing you the world, the news, products, and narratives of tomorrow, today.",
     "topics": ["sciene", "tech"],
     "siteLink": "https://futurism.com/",
     "rssLink": "https://futurism.com/feed"
   },
   {
-    "title": "freeCodeCamp ",
+    "title": "freeCodeCamp",
     "about": "A nonprofit community that helps you learn to code by building projects.",
     "topics": ["coding"],
     "siteLink": "https://www.freecodecamp.org/news/",
     "rssLink": "https://www.freecodecamp.org/news/rss/"
   },
   {
-    "title": "Smashing Magazine ",
+    "title": "Smashing Magazine",
     "about": "Smashing Magazine delivers reliable, useful, but most importantly practical articles to web designers and developers.",
     "topics": ["coding", "design", "web_design"],
     "siteLink": "https://www.smashingmagazine.com/",
@@ -83,7 +83,7 @@
   },
   {
     "title": "The Atlantic",
-    "about": " Ideas that enlighten, challenge, and delight.",
+    "about": "Ideas that enlighten, challenge, and delight.",
     "topics": [],
     "siteLink": "https://www.theatlantic.com/world/",
     "rssLink": "https://www.theatlantic.com/feed/all/"
@@ -120,7 +120,7 @@
     "title": "Vice",
     "about": "The Definitive Guide To An Uncertain World",
     "topics": ["news"],
-    "siteLink": "https://www.vice.com/en_us ",
+    "siteLink": "https://www.vice.com/en_us",
     "rssLink": "https://www.vice.com/en_us/rss"
   },
   {
@@ -147,8 +147,22 @@
   {
     "title": "ProPublica",
     "about": "An independent, non-profit newsroom that produces investigative journalism in the public interest.",
-    "topics": [ "investigative journalism "],
+    "topics": ["investigative journalism", "news"],
     "siteLink": "https://www.propublica.org/",
     "rssLink": "http://feeds.propublica.org/propublica/main"
+  },
+  {
+    "title": "NPR",
+    "about": "NPR news, audio, and podcasts. Coverage of breaking stories, national and world news, politics, business, science, technology, and extended coverage of major national and world events",
+    "topics": ["news"],
+    "siteLink": "https://www.npr.org/",
+    "rssLink": "https://www.npr.org/rss/rss.php"
+  },
+  {
+    "title": "Slate",
+    "about": "A daily magazine on the web",
+    "topics": ["magazine"],
+    "siteLink": "https://slate.com/",
+    "rssLink": "https://slate.com/feeds/all.rss"
   }
 ]

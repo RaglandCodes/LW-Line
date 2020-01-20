@@ -25,11 +25,9 @@ app.get('/', (request, response) => {
 
 app.get('/addNewItems', (query, respone) => {
   // Gets hit at periodic intervals to add new items
-  respone.end('K');
+  respone.end('|K|');
 
-  const sources = JSON.parse(
-    fs.readFileSync(path.join(__dirname, './sources.json'))
-  );
+  const sources = JSON.parse(fs.readFileSync(path.join(__dirname, './sources.json')));
 
   console.log(`${sources.length} <== sources.length\n\n`);
 
@@ -52,61 +50,80 @@ app.get('/addNewItems', (query, respone) => {
 
 app.get('/deleteOldItems', (query, respone) => {
   // Gets hit at periodic intervals to delete old items
-  respone.end('|DD|');
+  respone.end('|D|');
   db.deleteOldItems();
 });
 
+app.get('/sourceTopics', (request, response) => {
+  const sources = JSON.parse(fs.readFileSync(path.join(__dirname, './sources.json')));
+  let topics = [
+    ...new Set(sources.map(source => source.topics).reduce((a, c) => [...a, ...c]))
+  ];
+
+  //topics is array of the topics in the sources.json file
+
+  response.send(topics);
+});
 app.get('/getSources', (request, response) => {
   let searchTerm = request.query.searchTerm;
-  // let searchTopic = request.query.searchTopic;
+  let searchTopics = request.query.searchTopics;
+  const sources = JSON.parse(fs.readFileSync(path.join(__dirname, './sources.json')));
 
-  // if (searchTopic) {
-  //   const sources = JSON.parse(
-  //     fs.readFileSync(path.join(__dirname, './sources.json'))
-  //   );
-
-  //   console.log(`${searchTopic} <== searchTopic\n\n`);
-
-  //   let selectedSources = sources.filter(source => source.topics.includes(searchTopic));
-
-  //   response.send(selectedSources);
-  // }
-
-  
-  if (searchTerm === 'I_N_I_T') {
-    console.log('ST' + searchTerm);
-    const sources = JSON.parse(
-      fs.readFileSync(path.join(__dirname, './sources.json'))
-    );
-
-    let sourceResponse = {
-      tech: sources.filter(source => source.topics.includes('tech')),
-      news: sources.filter(source => source.topics.includes('news')),
-      design: sources.filter(source => source.topics.includes('design'))
-    };
-    response.send(sourceResponse)
-  } else if (searchTerm) {
-    console.log('in search term');
-
-    const sources = JSON.parse(
-      fs.readFileSync(path.join(__dirname, './sources.json'))
-    );
+  if (searchTerm) {
+    const sources = JSON.parse(fs.readFileSync(path.join(__dirname, './sources.json')));
 
     let results = sources.filter(
-      source =>
-        source.title.toLowerCase().indexOf(searchTerm.toLowerCase()) !== -1
+      source => source.title.toLowerCase().indexOf(searchTerm.toLowerCase()) !== -1
     );
-    console.log(`${results} <== results\n\n`);
+    console.log(`${JSON.stringify(results, null, 2)} <= results`);
 
     response.send(results);
+  } else if (searchTopics) {
+    searchTopics = searchTopics.split('AaNnDd');
+    let searchResult = sources.filter(source => {
+      return source.topics.filter(topic => searchTopics.includes(topic)).length;
+    });
+
+    response.send(searchResult);
   } else {
     response.end('ERROR');
   }
 });
 
-app.get('/singleItem', (request, response) => {});
+app.get('/singleItem', (request, response) => {
+  let id = request.query.id;
 
-app.get('/previewSource', (request, respone) => {});
+  db.getItemByRef(id)
+    .then(ret => {
+      response.send(ret);
+    })
+    .catch(getSingleItemError => {
+      console.log(`${getSingleItemError} <= getSingleItemError`);
+    });
+});
+
+app.get('/previewSource', (request, respone) => {
+  let searchSource = request.query.source;
+  const sources = JSON.parse(fs.readFileSync(path.join(__dirname, './sources.json')));
+
+  let selectedSource = sources.filter(source => source.title === searchSource)[0];
+  console.log(`${searchSource} <= searchSource`);
+  console.log(`${JSON.stringify(selectedSource, null, 2)} <= selectedSource`);
+
+  let sourceResponse = {
+    ...selectedSource
+  };
+
+  db.getItems([searchSource], {})
+    .then(responseData => {
+      selectedSource = { ...selectedSource, items: responseData };
+
+      respone.send(selectedSource);
+    })
+    .catch(previewSourceDBError =>
+      console.log(`${previewSourceDBError} <= previewSourceDBError`)
+    );
+});
 
 app.get('/getItems', (request, response) => {
   // Gets hit from the front-end
@@ -116,9 +133,8 @@ app.get('/getItems', (request, response) => {
   console.log(request.query.afterRef);
   console.log(request.query.afterTs);
 
-  console.log(`${after} <== after\n\n`);
+  console.log(`${JSON.stringify(after, null, 2)} <= after`);
 
-  //db.getItems(subscriptions);
   db.getItems(subscriptions, after).then(responseData => {
     response.send(responseData);
   });
