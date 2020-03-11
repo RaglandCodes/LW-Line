@@ -1,165 +1,189 @@
 [
   {
-    "title": "The Verge",
+    "feed": "The Verge",
+    "source": "The Verge",
     "rssLink": "https://www.theverge.com/rss/index.xml",
     "siteLink": "https://www.theverge.com/",
     "topics": ["tech"]
   },
   {
-    "title": "BBC",
+    "feed": "BBC World",
+    "source": "BBC",
     "rssLink": "https://feeds.bbci.co.uk/news/world/rss.xml",
     "siteLink": "https://www.bbc.com/",
     "topics": ["news"]
   },
   {
-    "title": "Ars Technica",
+    "source": "Ars Technica",
+    "feed": "Ars Technica",
     "rssLink": "http://feeds.arstechnica.com/arstechnica/index",
     "siteLink": "https://arstechnica.com",
     "type": "text",
     "topics": ["tech"]
   },
   {
-    "title": "The Next Web",
+    "source": "The Next Web",
+    "feed": "The Next Web",
     "rssLink": "http://feeds.feedburner.com/thenextweb",
     "siteLink": "https://thenextweb.com/",
     "type": "text",
     "topics": ["tech"]
   },
   {
-    "title": "Aeon",
+    "source": "Aeon",
+    "feed": "Aeon",
     "about": "Aeon is a magazine of ideas and culture. Publishing in-depth essays, incisive articles, and a mix of original and curated videos",
     "topics": ["magazine", "culture"],
     "siteLink": "https://aeon.co/",
     "rssLink": "https://aeon.co/feed.rss"
   },
   {
-    "title": "WIRED",
+    "source": "WIRED",
+    "feed": "WIRED",
     "about": "WIRED is where tomorrow is realised",
     "topics": ["magazine"],
     "siteLink": "https://www.wired.com/",
     "rssLink": "https://www.wired.com/feed/rss"
   },
   {
-    "title": "Futurism",
+    "source": "Futurism",
+    "feed": "Futurism",
     "about": "Bringing you the world, the news, products, and narratives of tomorrow, today.",
     "topics": ["sciene", "tech"],
     "siteLink": "https://futurism.com/",
     "rssLink": "https://futurism.com/feed"
   },
   {
-    "title": "freeCodeCamp",
+    "source": "freeCodeCamp",
+    "feed": "freeCodeCamp",
     "about": "A nonprofit community that helps you learn to code by building projects.",
     "topics": ["coding"],
     "siteLink": "https://www.freecodecamp.org/news/",
     "rssLink": "https://www.freecodecamp.org/news/rss/"
   },
   {
-    "title": "Smashing Magazine",
+    "source": "Smashing Magazine",
+    "feed": "Smashing Magazine",
     "about": "Smashing Magazine delivers reliable, useful, but most importantly practical articles to web designers and developers.",
     "topics": ["coding", "design", "web_design"],
     "siteLink": "https://www.smashingmagazine.com/",
     "rssLink": "https://www.smashingmagazine.com/feed"
   },
   {
-    "title": "TechCrunch",
+    "source": "TechCrunch",
+    "feed": "TechCrunch",
     "about": "Breaking technology news, analysis, and opinions from TechCrunch. Your number one guide for all things tech.",
     "topics": ["news", "tech"],
     "siteLink": "https://techcrunch.com/",
     "rssLink": "http://feeds.feedburner.com/TechCrunch/"
   },
   {
-    "title": "Fast Company",
+    "source": "Fast Company",
+    "feed": "Fast Company",
     "about": "World’s leading business media brand, with an editorial focus on innovation in technology, leadership, world changing ideas, creativity, and design",
     "topics": [],
     "siteLink": "https://www.fastcompany.com",
     "rssLink": "http://feeds.feedburner.com/fastcompany/headlines"
   },
   {
-    "title": "Adobe 99U",
+    "source": "Adobe 99U",
+    "feed": "Adobe 99U",
     "about": "A Creative Career Resource",
     "topics": ["design"],
     "siteLink": "https://99u.adobe.com/",
     "rssLink": "http://feeds.feedburner.com/The99Percent"
   },
   {
-    "title": "The Atlantic",
+    "source": "The Atlantic",
+    "feed": "The Atlantic World",
     "about": "Ideas that enlighten, challenge, and delight.",
     "topics": [],
     "siteLink": "https://www.theatlantic.com/world/",
     "rssLink": "https://www.theatlantic.com/feed/all/"
   },
   {
-    "title": "The Week [UK]",
+    "source": "The Week [UK]",
+    "feed": "The Week [UK]",
     "about": "All you need to know about every thing that matters",
     "topics": ["news"],
     "siteLink": "https://theweek.com/",
     "rssLink": "https://theweek.com/rss.xml"
   },
   {
-    "title": "CNET",
+    "source": "CNET",
+    "feed": "CNET",
     "about": "CNET is the world's leader in tech product reviews, news, prices, videos, forums, how-tos and more.",
     "topics": ["news", "tech"],
     "siteLink": "https://www.cnet.com/",
     "rssLink": "https://www.cnet.com/rss/all/"
   },
   {
-    "title": "Vox",
+    "source": "Vox",
+    "feed": "Vox",
     "about": "General interest news site for the 21st century. Its mission is simple: Explain the news.",
     "topics": ["news"],
     "siteLink": "https://www.vox.com/",
     "rssLink": "https://www.vox.com/rss/index.xml"
   },
   {
-    "title": "The Economist",
+    "source": "The Economist",
+    "feed": "The Economist Briefing",
     "about": "News and analysis with a global perspective",
     "topics": ["news"],
     "siteLink": "https://www.economist.com/briefing/rss.xml",
     "rssLink": "https://www.economist.com/briefing/rss.xml"
   },
   {
-    "title": "Vice",
+    "source": "Vice",
+    "feed": "Vice",
     "about": "The Definitive Guide To An Uncertain World",
     "topics": ["news"],
     "siteLink": "https://www.vice.com/en_us",
     "rssLink": "https://www.vice.com/en_us/rss"
   },
   {
-    "title": "MIT Technology Review",
+    "source": "MIT Technology Review",
+    "feed": "MIT Technology Review",
     "about": "MIT Technology Review is first to report on important new technologies that will affect your organization, your career, your life.",
     "topics": ["news", "tech"],
     "siteLink": "https://www.technologyreview.com/",
     "rssLink": "https://www.technologyreview.com/stories.rss"
   },
   {
-    "title": "The Wall Street Journal",
+    "source": "The Wall Street Journal",
+    "feed": "The Wall Street Journal World",
     "about": "Coverage of breaking news and current headlines from the US and around the world",
     "topics": ["news"],
     "siteLink": "https://www.wsj.com/",
     "rssLink": "https://feeds.a.dj.com/rss/RSSWorldNews.xml"
   },
   {
-    "title": "Surface",
+    "source": "Surface",
+    "feed": "Surface",
     "about": "Surface covers the worlds of architecture, art, design, fashion, and travel, with a focus on how these fields shape and are shaped by contemporary culture. ",
     "topics": ["art", "design"],
     "siteLink": "https://www.surfacemag.com/",
     "rssLink": "https://www.surfacemag.com/feed/"
   },
   {
-    "title": "ProPublica",
+    "source": "ProPublica",
+    "feed": "ProPublica",
     "about": "An independent, non-profit newsroom that produces investigative journalism in the public interest.",
     "topics": ["investigative journalism", "news"],
     "siteLink": "https://www.propublica.org/",
     "rssLink": "http://feeds.propublica.org/propublica/main"
   },
   {
-    "title": "NPR",
+    "source": "NPR",
+    "feed": "NPR",
     "about": "NPR news, audio, and podcasts. Coverage of breaking stories, national and world news, politics, business, science, technology, and extended coverage of major national and world events",
     "topics": ["news"],
     "siteLink": "https://www.npr.org/",
     "rssLink": "https://www.npr.org/rss/rss.php"
   },
   {
-    "title": "Slate",
+    "source": "Slate",
+    "feed": "Slate",
     "about": "A daily magazine on the web",
     "topics": ["magazine"],
     "siteLink": "https://slate.com/",

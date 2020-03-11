@@ -25,7 +25,7 @@ app.get('/', (request, response) => {
 
 app.get('/addNewItems', (query, respone) => {
   // Gets hit at periodic intervals to add new items
-  respone.end('|K|');
+  respone.end('¯_(ツ)_/¯');
 
   const sources = JSON.parse(fs.readFileSync(path.join(__dirname, './sources.json')));
 
@@ -37,7 +37,7 @@ app.get('/addNewItems', (query, respone) => {
       .then(newItems => {
         console.count('Finished scrapping');
         if (newItems.length === 0) {
-          console.log(`N0t adding anything for ${source.title}`);
+          console.log(`N0t adding anything for ${source.feed}`);
         } else {
           db.addMultiple(newItems);
         }
@@ -50,7 +50,7 @@ app.get('/addNewItems', (query, respone) => {
 
 app.get('/deleteOldItems', (query, respone) => {
   // Gets hit at periodic intervals to delete old items
-  respone.end('|D|');
+  respone.end('(•‿•)');
   db.deleteOldItems();
 });
 
@@ -98,6 +98,7 @@ app.get('/singleItem', (request, response) => {
       response.send(ret);
     })
     .catch(getSingleItemError => {
+      response.send('ERROR');
       console.log(`${getSingleItemError} <= getSingleItemError`);
     });
 });
@@ -120,9 +121,10 @@ app.get('/previewSource', (request, respone) => {
 
       respone.send(selectedSource);
     })
-    .catch(previewSourceDBError =>
-      console.log(`${previewSourceDBError} <= previewSourceDBError`)
-    );
+    .catch(previewSourceDBError => {
+      console.log(`${previewSourceDBError} <= previewSourceDBError`);
+      respone.end('ERROR');
+    });
 });
 
 app.get('/getItems', (request, response) => {
@@ -135,9 +137,13 @@ app.get('/getItems', (request, response) => {
 
   console.log(`${JSON.stringify(after, null, 2)} <= after`);
 
-  db.getItems(subscriptions, after).then(responseData => {
-    response.send(responseData);
-  });
+  db.getItems(subscriptions, after)
+    .then(responseData => {
+      response.send(responseData);
+    })
+    .catch(error => {
+      response.end('ERROR');
+    });
 });
 
 app.listen(5151, () => {

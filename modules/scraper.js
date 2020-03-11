@@ -8,6 +8,7 @@ const path = require('path');
 const metafetch = require('metafetch');
 
 // --------------- functions ----------
+
 function getMeta(item) {
   return new Promise((resolve, reject) => {
     metafetch.fetch(
@@ -47,25 +48,30 @@ function getMeta(item) {
 async function getNewItems(source) {
   let [newData, lastItemDate] = await Promise.all([
     parser.parseURL(source['rssLink']),
-    db.getLastItem(source['title'])
+    db.getLastItemDate(source['feed'])
   ]).catch(getNewItemsError => {
     console.log(`${getNewItemsError} <= getNewItemsError ${source}`);
     return [];
   });
 
-  if (lastItemDate === '') {
-    newData = newData.items;
-  } else {
-    newData = newData.items.filter(item => {
-      return new Date(item.pubDate) > new Date(lastItemDate);
-    });
+  if (!newData) {
+    console.log('New data was falsy for' + source['feed']);
+    console.log(`${newData} <== newData`);
+
+    return [];
   }
+  newData = newData.items.filter(item => {
+    return new Date(item.pubDate) > new Date(lastItemDate);
+  });
+
+  console.log(`${newData.length} <== newData.length`);
 
   let scrappedItems = newData.map(item => ({
     title: item.title,
-    description: item.contentSnippet,
+    contentSnippet: item.contentSnippet,
     topics: item.categories ? [...item.categories, ...source.topics] : [...source.topics],
-    source: source.title,
+    source: source.source,
+    feed: source.feed,
     date: new Date(item.pubDate).toISOString(),
     link: item.link
   }));
@@ -74,10 +80,11 @@ async function getNewItems(source) {
     scrappedItems.map(item => getMeta(item))
   );
 
+  //   return [];
+
   return scrappedItemsWithMetaData;
 } // end of function getNewItems
 
-// --------------- exports ----------
 module.exports = {
   getNewItems: getNewItems
 };
