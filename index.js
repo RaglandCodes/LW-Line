@@ -105,17 +105,13 @@ app.get('/singleItem', (request, response) => {
 
 app.get('/previewSource', (request, respone) => {
   let searchSource = request.query.source;
+  let after = { ref: request.query.afterRef, ts: request.query.afterTs };
+
   const sources = JSON.parse(fs.readFileSync(path.join(__dirname, './sources.json')));
 
-  let selectedSource = sources.filter(source => source.title === searchSource)[0];
-  console.log(`${searchSource} <= searchSource`);
-  console.log(`${JSON.stringify(selectedSource, null, 2)} <= selectedSource`);
+  let selectedSource = sources.filter(source => source.feed === searchSource)[0];
 
-  let sourceResponse = {
-    ...selectedSource
-  };
-
-  db.getItems([searchSource], {})
+  db.getItems([searchSource], after)
     .then(responseData => {
       selectedSource = { ...selectedSource, items: responseData };
 
@@ -132,10 +128,7 @@ app.get('/getItems', (request, response) => {
 
   let subscriptions = request.query.subscriptions.split('AaNnDd');
   let after = { ref: request.query.afterRef, ts: request.query.afterTs };
-  console.log(request.query.afterRef);
-  console.log(request.query.afterTs);
-
-  console.log(`${JSON.stringify(after, null, 2)} <= after`);
+  //console.log(`${JSON.stringify(after, null, 2)} <= after`);
 
   db.getItems(subscriptions, after)
     .then(responseData => {
@@ -151,7 +144,7 @@ app.listen(5151, () => {
 });
 
 // This is to be able to remix on Glitch
-// https://glitch.com/~lw-line
+// https://glitch.com/~lw-line-backend
 /*
 
  const listener = app.listen(process.env.PORT, function() {

@@ -158,7 +158,7 @@ function deleteOldItems() {
     .then(queryResult => {
       let fiveDaysAgo = new Date(new Date().setDate(new Date().getDate() - 0));
       let refsToDelete = queryResult.data
-        // BOMB .filter(item => new Date(item[0]) < fiveDaysAgo)
+        .filter(item => new Date(item[0]) < fiveDaysAgo)
         .map(item => JSON.parse(JSON.stringify(item[1]))['@ref']['id']);
       return refsToDelete;
     })

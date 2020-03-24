@@ -7,11 +7,18 @@
     "topics": ["tech"]
   },
   {
-    "feed": "BBC World",
+    "feed": "BBC News - World",
     "source": "BBC",
     "rssLink": "https://feeds.bbci.co.uk/news/world/rss.xml",
     "siteLink": "https://www.bbc.com/",
     "topics": ["news"]
+  },
+  {
+    "feed": "BBC News - Tech",
+    "source": "BBC",
+    "rssLink": "http://feeds.bbci.co.uk/news/technology/rss.xml",
+    "siteLink": "https://www.bbc.com/news/technology",
+    "topics": ["news", "tech"]
   },
   {
     "source": "Ars Technica",
@@ -132,6 +139,22 @@
     "topics": ["news"],
     "siteLink": "https://www.economist.com/briefing/rss.xml",
     "rssLink": "https://www.economist.com/briefing/rss.xml"
+  },
+  {
+    "source": "The Economist",
+    "feed": "TThe Economist - Asia",
+    "about": "News and analysis with a global perspective",
+    "topics": ["news", "locale:Asia"],
+    "siteLink": "https://www.economist.com/asia/",
+    "rssLink": "https://www.economist.com/asia/rss.xml"
+  },
+  {
+    "source": "The Economist",
+    "feed": "TThe Economist - Science and technology",
+    "about": "News and analysis with a global perspective",
+    "topics": ["news", "sciene", "technology"],
+    "siteLink": "https://www.economist.com/asia/",
+    "rssLink": "https://www.economist.com/asia/rss.xml"
   },
   {
     "source": "Vice",
