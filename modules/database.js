@@ -99,7 +99,13 @@ async function getItems(sources, after) {
         throw new Error('ERROR');
         return;
       }
-      let afterRef = ret['after'][1]['@ref']['id'];
+
+      //TODO nullish coalasence
+
+      //If there's no after, put an empty string
+      //TODO handle this in front end
+      let afterRef = ret['after'] ? ret['after'][1]['@ref']['id'] : '';
+
       return {
         data: ret.data.map(item => ({
           id: item['ref']['@ref']['id'],
@@ -114,7 +120,7 @@ async function getItems(sources, after) {
         })),
         after: {
           ref: afterRef,
-          ts: ret['after'][0]
+          ts: ret['after'] ? ret['after'][0] : ''
         }
       };
     })

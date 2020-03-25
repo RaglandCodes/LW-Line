@@ -142,7 +142,7 @@
   },
   {
     "source": "The Economist",
-    "feed": "TThe Economist - Asia",
+    "feed": "The Economist - Asia",
     "about": "News and analysis with a global perspective",
     "topics": ["news", "locale:Asia"],
     "siteLink": "https://www.economist.com/asia/",
@@ -150,11 +150,19 @@
   },
   {
     "source": "The Economist",
-    "feed": "TThe Economist - Science and technology",
+    "feed": "The Economist - Europe",
+    "about": "News and analysis with a global perspective",
+    "topics": ["news", "locale:Europe"],
+    "siteLink": "https://www.economist.com/europe/",
+    "rssLink": "https://www.economist.com/europe/rss.xml"
+  },
+  {
+    "source": "The Economist",
+    "feed": "The Economist - Science and technology",
     "about": "News and analysis with a global perspective",
     "topics": ["news", "sciene", "technology"],
     "siteLink": "https://www.economist.com/asia/",
-    "rssLink": "https://www.economist.com/asia/rss.xml"
+    "rssLink": "https://www.economist.com/science-and-technology/rss.xml"
   },
   {
     "source": "Vice",
@@ -211,5 +219,69 @@
     "topics": ["magazine"],
     "siteLink": "https://slate.com/",
     "rssLink": "https://slate.com/feeds/all.rss"
+  },
+  {
+    "source": "BuzzFeed",
+    "feed": "BuzzFeed - Food",
+    "about": "All the trending buzz you’ll want to share with your friends",
+    "topics": ["food"],
+    "siteLink": "https://www.buzzfeed.com/food",
+    "rssLink": "https://www.buzzfeed.com/food.xml"
+  },
+  {
+    "source": "Quanta Magazine",
+    "feed": "Quanta Magazine",
+    "about": "Illuminating basic science and math research through public service journalism.",
+    "topics": ["science", "magazine"],
+    "siteLink": "https://www.quantamagazine.org/",
+    "rssLink": "https://api.quantamagazine.org/feed/"
+  },
+  {
+    "source": "Knowable Magazine",
+    "feed": "Knowable Magazine",
+    "about": "Knowable Magazine explores the real-world significance of scholarly work through a journalistic lens.",
+    "topics": ["science", "magazine"],
+    "siteLink": "https://www.knowablemagazine.org/",
+    "rssLink": "https://www.knowablemagazine.org/rss"
+  },
+  {
+    "source": "The Intercept",
+    "feed": "The Intercept",
+    "about": "The Intercept is an award-winning news organization dedicated to holding the powerful accountable through fearless, adversarial journalism.",
+    "topics": ["news"],
+    "siteLink": "https://theintercept.com/",
+    "rssLink": "https://theintercept.com/feed/?rss"
+  },
+  {
+    "source": "Longreads",
+    "feed": "Longreads",
+    "about": "Longreads is dedicated to helping people find and share the best storytelling in the world; featuring in-depth investigative reporting, interviews and profiles, podcasts, essays and criticism.",
+    "topics": [],
+    "siteLink": "https://longreads.com/",
+    "rssLink": "https://longreads.com/feed/"
+  },
+  {
+    "source": "The New Yorker",
+    "feed": "The New Yorker - News",
+    "about": "The New Yorker stands apart for its commitment to truth and accuracy, for the quality of its prose, and for its insistence on exciting and moving every reader..",
+    "topics": ["news"],
+    "siteLink": "https://www.newyorker.com/news",
+    "rssLink": "https://www.newyorker.com/feed/news"
+  },
+  {
+    "source": "The New Yorker",
+    "feed": "The New Yorker - Radio Hour",
+    "about": "The New Yorker stands apart for its commitment to truth and accuracy, for the quality of its prose, and for its insistence on exciting and moving every reader..",
+    "topics": ["podcast"],
+    "siteLink": "https://www.newyorker.com/podcast/the-new-yorker-radio-hour",
+    "rssLink": "http://feeds.wnyc.org/newyorkerradiohour"
+  },
+  {
+    "source": "The New Yorker",
+    "feed": "The New Yorker - Culture",
+    "about": "The New Yorker stands apart for its commitment to truth and accuracy, for the quality of its prose, and for its insistence on exciting and moving every reader..",
+    "topics": ["culture"],
+    "siteLink": "https://www.newyorker.com/culture",
+    "rssLink": "https://www.newyorker.com/feed/culture"
   }
 ]

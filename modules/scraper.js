@@ -64,7 +64,7 @@ async function getNewItems(source) {
     return new Date(item.pubDate) > new Date(lastItemDate);
   });
 
-  console.log(`${newData.length} <== newData.length`);
+  console.log(`${newData.length} <== newData.length ==> ${source.feed}`);
 
   let scrappedItems = newData.map(item => ({
     title: item.title,

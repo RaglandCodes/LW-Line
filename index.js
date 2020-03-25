@@ -73,7 +73,7 @@ app.get('/getSources', (request, response) => {
     const sources = JSON.parse(fs.readFileSync(path.join(__dirname, './sources.json')));
 
     let results = sources.filter(
-      source => source.title.toLowerCase().indexOf(searchTerm.toLowerCase()) !== -1
+      source => source.feed.toLowerCase().indexOf(searchTerm.toLowerCase()) !== -1
     );
     console.log(`${JSON.stringify(results, null, 2)} <= results`);
 
@@ -90,6 +90,26 @@ app.get('/getSources', (request, response) => {
   }
 });
 
+app.get('/sourceCount', (request, response) => {
+  const feeds = JSON.parse(fs.readFileSync(path.join(__dirname, './sources.json')));
+
+  let feedNames = feeds.map(feed => feed.feed);
+  let noOfFeeds = feeds.length;
+
+  let sourceNames = [...new Set(feeds.map(feed => feed.source))];
+  let noOfSources = sourceNames.length;
+
+  response.send(`
+  
+  There are ${noOfFeeds} Feeds from ${noOfSources} sources\n
+  -------------------------------\n
+  Feeds: \n- ${feedNames.join('\n- ')}\n
+  -------------------------------\n
+  Sources \n- ${sourceNames.join('\n- ')}\n
+
+  
+  `);
+});
 app.get('/singleItem', (request, response) => {
   let id = request.query.id;
 
