@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "nodemon --ignore \"*.json\""
+    "start": "clear && nodemon --ignore \"*.json\""
   },
   "author": "Ragland Asir",
   "license": "ISC",
@@ -13,7 +13,7 @@
     "express": "^4.17.1",
     "faunadb": "^2.10.0",
     "metafetch": "^1.9.3",
-    "rss-parser": "^3.7.3"
+    "rss-parser": "^3.7.6"
   },
   "devDependencies": {
     "nodemon": "^2.0.1"

@@ -1,7 +1,7 @@
 // --------------- dependencies ----------
 
 const Parser = require('rss-parser');
-let parser = new Parser();
+//let parser = new Parser();
 const db = require('./database');
 const fs = require('fs');
 const path = require('path');
@@ -45,7 +45,19 @@ function getMeta(item) {
   }); // end of return new promise
 } // end of function getMeta
 
+async function getDataFromLink(feedLink) {
+  let parser = new Parser();
+  let feedData;
+  console.log(`${feedLink} <== feedLink`);
+
+  feedData = await parser.parseURL(feedLink).catch(feedDataError => {
+    console.log(`${feedDataError} <== feedDataError`);
+    return [];
+  });
+  return feedData;
+}
 async function getNewItems(source) {
+  let parser = new Parser();
   let [newData, lastItemDate] = await Promise.all([
     parser.parseURL(source['rssLink']),
     db.getLastItemDate(source['feed'])
@@ -69,7 +81,9 @@ async function getNewItems(source) {
   let scrappedItems = newData.map(item => ({
     title: item.title,
     contentSnippet: item.contentSnippet,
-    topics: item.categories ? [...item.categories, ...source.topics] : [...source.topics],
+    topics: item.categories
+      ? [...item.categories, ...source.topics]
+      : [...source.topics],
     source: source.source,
     feed: source.feed,
     date: new Date(item.pubDate).toISOString(),
@@ -86,5 +100,6 @@ async function getNewItems(source) {
 } // end of function getNewItems
 
 module.exports = {
-  getNewItems: getNewItems
+  getNewItems: getNewItems,
+  getDataFromLink: getDataFromLink
 };

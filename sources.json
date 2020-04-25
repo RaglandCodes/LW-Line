@@ -205,14 +205,6 @@
     "rssLink": "http://feeds.propublica.org/propublica/main"
   },
   {
-    "source": "NPR",
-    "feed": "NPR",
-    "about": "NPR news, audio, and podcasts. Coverage of breaking stories, national and world news, politics, business, science, technology, and extended coverage of major national and world events",
-    "topics": ["news"],
-    "siteLink": "https://www.npr.org/",
-    "rssLink": "https://www.npr.org/rss/rss.php"
-  },
-  {
     "source": "Slate",
     "feed": "Slate",
     "about": "A daily magazine on the web",

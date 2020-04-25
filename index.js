@@ -4,11 +4,11 @@ const express = require('express');
 const db = require('./modules/database');
 const scrapper = require('./modules/scraper');
 const app = express(); //.use(bodyParser.json());
-
+const sourcesModule = require('./modules/sources');
 const fs = require('fs');
 const path = require('path');
 
-app.use(function(req, res, next) {
+app.use(function (req, res, next) {
   res.header('Access-Control-Allow-Origin', '*');
   res.header(
     'Access-Control-Allow-Headers',
@@ -27,7 +27,9 @@ app.get('/addNewItems', (query, respone) => {
   // Gets hit at periodic intervals to add new items
   respone.end('¯_(ツ)_/¯');
 
-  const sources = JSON.parse(fs.readFileSync(path.join(__dirname, './sources.json')));
+  const sources = JSON.parse(
+    fs.readFileSync(path.join(__dirname, './sources.json'))
+  );
 
   console.log(`${sources.length} <== sources.length\n\n`);
 
@@ -55,25 +57,39 @@ app.get('/deleteOldItems', (query, respone) => {
 });
 
 app.get('/sourceTopics', (request, response) => {
-  const sources = JSON.parse(fs.readFileSync(path.join(__dirname, './sources.json')));
+  //TODO delete this function and route
+  const sources = JSON.parse(
+    fs.readFileSync(path.join(__dirname, './sources.json'))
+  );
   let topics = [
-    ...new Set(sources.map(source => source.topics).reduce((a, c) => [...a, ...c]))
+    ...new Set(
+      sources.map(source => source.topics).reduce((a, c) => [...a, ...c])
+    )
   ];
 
   //topics is array of the topics in the sources.json file
 
   response.send(topics);
 });
+
+// Returns a Set of all topics
+app.get('/feedTopics', sourcesModule.routeFeedTopics);
+
 app.get('/getSources', (request, response) => {
   let searchTerm = request.query.searchTerm;
   let searchTopics = request.query.searchTopics;
-  const sources = JSON.parse(fs.readFileSync(path.join(__dirname, './sources.json')));
+  const sources = JSON.parse(
+    fs.readFileSync(path.join(__dirname, './sources.json'))
+  );
 
   if (searchTerm) {
-    const sources = JSON.parse(fs.readFileSync(path.join(__dirname, './sources.json')));
+    const sources = JSON.parse(
+      fs.readFileSync(path.join(__dirname, './sources.json'))
+    );
 
     let results = sources.filter(
-      source => source.feed.toLowerCase().indexOf(searchTerm.toLowerCase()) !== -1
+      source =>
+        source.feed.toLowerCase().indexOf(searchTerm.toLowerCase()) !== -1
     );
     console.log(`${JSON.stringify(results, null, 2)} <= results`);
 
@@ -90,8 +106,19 @@ app.get('/getSources', (request, response) => {
   }
 });
 
+app.get('/feedForStories', sourcesModule.routeFeedForStories);
+app.get('/allFeeds', (request, response) => {
+  //TODO delete this
+  const sources = JSON.parse(
+    fs.readFileSync(path.join(__dirname, './sources.json'))
+  );
+  response.send(sources);
+});
+
 app.get('/sourceCount', (request, response) => {
-  const feeds = JSON.parse(fs.readFileSync(path.join(__dirname, './sources.json')));
+  const feeds = JSON.parse(
+    fs.readFileSync(path.join(__dirname, './sources.json'))
+  );
 
   let feedNames = feeds.map(feed => feed.feed);
   let noOfFeeds = feeds.length;
@@ -127,9 +154,13 @@ app.get('/previewSource', (request, respone) => {
   let searchSource = request.query.source;
   let after = { ref: request.query.afterRef, ts: request.query.afterTs };
 
-  const sources = JSON.parse(fs.readFileSync(path.join(__dirname, './sources.json')));
+  const sources = JSON.parse(
+    fs.readFileSync(path.join(__dirname, './sources.json'))
+  );
 
-  let selectedSource = sources.filter(source => source.feed === searchSource)[0];
+  let selectedSource = sources.filter(
+    source => source.feed === searchSource
+  )[0];
 
   db.getItems([searchSource], after)
     .then(responseData => {
@@ -156,6 +187,26 @@ app.get('/getItems', (request, response) => {
     })
     .catch(error => {
       response.end('ERROR');
+    });
+});
+
+app.get('/feedFromLink', (request, response) => {
+  // Returns feed items given an RSS link
+
+  const requestLink = request.query.feedLink;
+  if (sourcesModule.checkIfFeedExists(requestLink)) {
+    //response.send()
+    response.send({ message: 'Normal Exists' });
+    return;
+  }
+  scrapper
+    .getDataFromLink(requestLink)
+    .then(responseData => {
+      response.send(responseData);
+    })
+    .catch(feedFromLinkError => {
+      console.log(`${feedFromLinkError} <== feedFromLinkError`);
+      response.send([]);
     });
 });
 

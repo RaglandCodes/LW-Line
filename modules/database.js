@@ -28,7 +28,9 @@ function addMultiple(newPosts) {
         })
         .catch(toDateError => {
           resolve('ERROR');
-          console.log(`${toDateError} <== toDateError for ${newPosts[0]['feed']}\n\n`);
+          console.log(
+            `${toDateError} <== toDateError for ${newPosts[0]['feed']}\n\n`
+          );
         });
     });
   });
@@ -68,7 +70,7 @@ async function getItemByRef(id) {
     });
 }
 
-async function getItems(sources, after) {
+async function getItems(sources, after, options = {}) {
   //get the items based by source from the databse to show to the user
 
   let matchQueries = sources.map(source =>
@@ -83,8 +85,10 @@ async function getItems(sources, after) {
     .query(
       q.Map(
         q.Paginate(q.Union(matchQueries), {
-          size: 9,
-          after: after.ref ? [after.ts, q.Ref(q.Collection('articles'), after.ref)] : []
+          size: options.size ? options.size : 9, // TODO remove ternary
+          after: after.ref
+            ? [after.ts, q.Ref(q.Collection('articles'), after.ref)]
+            : []
         }),
         q.Lambda(['feed', 'ref'], q.Get(q.Var('ref')))
       )
@@ -93,7 +97,7 @@ async function getItems(sources, after) {
     .then(ret => {
       //console.log(`${JSON.stringify(ret)} <== getItems query ret\n\n`);
       //fs.writeFileSync(path.join(__dirname, './aa.json'), JSON.stringify(ret));
-      console.log(`${ret.data.length} <== ret.data.length\n\n`);
+      console.log(`${ret.data.length} <== ret.data.length\n\n ==> ${sources}`);
 
       if (ret.data.length === 0) {
         throw new Error('ERROR');
@@ -172,7 +176,10 @@ function deleteOldItems() {
       return client.query(
         q.Map(
           refs,
-          q.Lambda('ref', q.Delete(q.Ref(q.Collection('articles'), q.Var('ref'))))
+          q.Lambda(
+            'ref',
+            q.Delete(q.Ref(q.Collection('articles'), q.Var('ref')))
+          )
         )
       );
     })
