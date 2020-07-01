@@ -7,31 +7,68 @@ const app = express(); //.use(bodyParser.json());
 const sourcesModule = require('./modules/sources');
 const fs = require('fs');
 const path = require('path');
+const nanoid = require('nanoid');
 
+// --------------- globals ----------
+
+let lastUpdatedAt;
+
+// --------------- middlewares ----------
+
+// CORS
 app.use(function (req, res, next) {
   res.header('Access-Control-Allow-Origin', '*');
-  res.header(
-    'Access-Control-Allow-Headers',
-    'Origin, X-Requested-With, Content-Type, Accept'
-  );
+  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
   next();
 });
 
-// --------------- GET requests ----------
+// middleware to add new stories
+app.use((req, res, next) => {
+  next();
 
-app.get('/', (request, response) => {
-  response.end('LW Line');
+  // do not add again when already adding
+  if (req.path.indexOf('addNewItems') !== -1) {
+    return;
+  }
+
+  // read from file if unavailable
+  if (!lastUpdatedAt) {
+    fs.readFile(path.join(__dirname, './last_updated.txt'), 'utf8', (err, dateInFile) => {
+      if (err) {
+        lastUpdatedAt = Date.now();
+        return;
+      }
+      lastUpdatedAt = parseInt(dateInFile);
+
+      update();
+    });
+  } else {
+    update();
+  }
+
+  function update(params) {
+    // update frequecy is more that 1 hour
+    if (Date.now() - lastUpdatedAt < 1000 * 60 * 60) {
+      return;
+    }
+
+    console.log('Will update with new stories');
+    routeAddNewItems(req, res);
+    lastUpdatedAt = Date.now();
+    fs.writeFile(path.join(__dirname, './last_updated.txt'), lastUpdatedAt, err => {
+      if (err) {
+        console.log(err);
+      }
+    });
+  }
 });
 
-app.get('/addNewItems', (query, respone) => {
-  // Gets hit at periodic intervals to add new items
-  respone.end('¯_(ツ)_/¯');
+// --------------- functions ----------
 
-  const sources = JSON.parse(
-    fs.readFileSync(path.join(__dirname, './sources.json'))
-  );
-
-  console.log(`${sources.length} <== sources.length\n\n`);
+function routeAddNewItems(request, respone) {
+  respone.end('OK');
+  console.log(`${request.path} <== request.path`);
+  const sources = JSON.parse(fs.readFileSync(path.join(__dirname, './sources.json')));
 
   for (const source of sources) {
     scrapper
@@ -48,7 +85,15 @@ app.get('/addNewItems', (query, respone) => {
         console.log(`${cronError} <== cronError \n`);
       });
   }
+}
+
+// --------------- GET requests ----------
+
+app.get('/', (request, response) => {
+  response.end('LW Line');
 });
+
+app.get('/addNewItems', routeAddNewItems);
 
 app.get('/deleteOldItems', (query, respone) => {
   // Gets hit at periodic intervals to delete old items
@@ -58,14 +103,8 @@ app.get('/deleteOldItems', (query, respone) => {
 
 app.get('/sourceTopics', (request, response) => {
   //TODO delete this function and route
-  const sources = JSON.parse(
-    fs.readFileSync(path.join(__dirname, './sources.json'))
-  );
-  let topics = [
-    ...new Set(
-      sources.map(source => source.topics).reduce((a, c) => [...a, ...c])
-    )
-  ];
+  const sources = JSON.parse(fs.readFileSync(path.join(__dirname, './sources.json')));
+  let topics = [...new Set(sources.map(source => source.topics).reduce((a, c) => [...a, ...c]))];
 
   //topics is array of the topics in the sources.json file
 
@@ -78,18 +117,13 @@ app.get('/feedTopics', sourcesModule.routeFeedTopics);
 app.get('/getSources', (request, response) => {
   let searchTerm = request.query.searchTerm;
   let searchTopics = request.query.searchTopics;
-  const sources = JSON.parse(
-    fs.readFileSync(path.join(__dirname, './sources.json'))
-  );
+  const sources = JSON.parse(fs.readFileSync(path.join(__dirname, './sources.json')));
 
   if (searchTerm) {
-    const sources = JSON.parse(
-      fs.readFileSync(path.join(__dirname, './sources.json'))
-    );
+    const sources = JSON.parse(fs.readFileSync(path.join(__dirname, './sources.json')));
 
     let results = sources.filter(
-      source =>
-        source.feed.toLowerCase().indexOf(searchTerm.toLowerCase()) !== -1
+      source => source.feed.toLowerCase().indexOf(searchTerm.toLowerCase()) !== -1
     );
     console.log(`${JSON.stringify(results, null, 2)} <= results`);
 
@@ -109,34 +143,10 @@ app.get('/getSources', (request, response) => {
 app.get('/feedForStories', sourcesModule.routeFeedForStories);
 app.get('/allFeeds', (request, response) => {
   //TODO delete this
-  const sources = JSON.parse(
-    fs.readFileSync(path.join(__dirname, './sources.json'))
-  );
+  const sources = JSON.parse(fs.readFileSync(path.join(__dirname, './sources.json')));
   response.send(sources);
 });
 
-app.get('/sourceCount', (request, response) => {
-  const feeds = JSON.parse(
-    fs.readFileSync(path.join(__dirname, './sources.json'))
-  );
-
-  let feedNames = feeds.map(feed => feed.feed);
-  let noOfFeeds = feeds.length;
-
-  let sourceNames = [...new Set(feeds.map(feed => feed.source))];
-  let noOfSources = sourceNames.length;
-
-  response.send(`
-  
-  There are ${noOfFeeds} Feeds from ${noOfSources} sources\n
-  -------------------------------\n
-  Feeds: \n- ${feedNames.join('\n- ')}\n
-  -------------------------------\n
-  Sources \n- ${sourceNames.join('\n- ')}\n
-
-  
-  `);
-});
 app.get('/singleItem', (request, response) => {
   let id = request.query.id;
 
@@ -154,13 +164,9 @@ app.get('/previewSource', (request, respone) => {
   let searchSource = request.query.source;
   let after = { ref: request.query.afterRef, ts: request.query.afterTs };
 
-  const sources = JSON.parse(
-    fs.readFileSync(path.join(__dirname, './sources.json'))
-  );
+  const sources = JSON.parse(fs.readFileSync(path.join(__dirname, './sources.json')));
 
-  let selectedSource = sources.filter(
-    source => source.feed === searchSource
-  )[0];
+  let selectedSource = sources.filter(source => source.feed === searchSource)[0];
 
   db.getItems([searchSource], after)
     .then(responseData => {
@@ -195,10 +201,10 @@ app.get('/feedFromLink', (request, response) => {
 
   const requestLink = request.query.feedLink;
   if (sourcesModule.checkIfFeedExists(requestLink)) {
-    //response.send()
     response.send({ message: 'Normal Exists' });
     return;
   }
+
   scrapper
     .getDataFromLink(requestLink)
     .then(responseData => {

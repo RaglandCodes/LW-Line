@@ -115,6 +115,7 @@ async function getItems(sources, after, options = {}) {
           id: item['ref']['@ref']['id'],
           title: item['data']['title'],
           source: item['data']['source'],
+          date: item['data']['date'],
           topics: [...item['data']['topics']],
           link: item['data']['link'],
           image: item['data']['image'],
