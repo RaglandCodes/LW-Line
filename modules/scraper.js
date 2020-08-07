@@ -81,18 +81,14 @@ async function getNewItems(source) {
   let scrappedItems = newData.map(item => ({
     title: item.title,
     contentSnippet: item.contentSnippet,
-    topics: item.categories
-      ? [...item.categories, ...source.topics]
-      : [...source.topics],
+    topics: item.categories ? [...item.categories, ...source.topics] : [...source.topics],
     source: source.source,
     feed: source.feed,
     date: new Date(item.pubDate).toISOString(),
     link: item.link
   }));
 
-  let scrappedItemsWithMetaData = await Promise.all(
-    scrappedItems.map(item => getMeta(item))
-  );
+  let scrappedItemsWithMetaData = await Promise.all(scrappedItems.map(item => getMeta(item)));
 
   //   return [];
 

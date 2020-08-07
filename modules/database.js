@@ -28,9 +28,7 @@ function addMultiple(newPosts) {
         })
         .catch(toDateError => {
           resolve('ERROR');
-          console.log(
-            `${toDateError} <== toDateError for ${newPosts[0]['feed']}\n\n`
-          );
+          console.log(`${toDateError} <== toDateError for ${newPosts[0]['feed']}\n\n`);
         });
     });
   });
@@ -55,9 +53,7 @@ function addMultiple(newPosts) {
       );
     })
     .catch(addMultipleQueryError =>
-      console.error(
-        `${JSON.stringify(addMultipleQueryError)} <== addMultipleQueryError \n`
-      )
+      console.error(`${JSON.stringify(addMultipleQueryError)} <== addMultipleQueryError \n`)
     );
 } // end of addMultiple
 
@@ -70,6 +66,21 @@ async function getItemByRef(id) {
     });
 }
 
+async function getTopicsFromFeeds() {
+  return client
+    .query(
+      q.Map(
+        q.Paginate(q.Match(q.Index('getFeedsIndex'))),
+        q.Lambda('X', q.Select(['data', 'topics'], q.Get(q.Var('X'))))
+      )
+    )
+    .then(ret => {
+      return ret;
+    })
+    .catch(getFeedTopicsError => {
+      throw new Error('ERROR  ' + getFeedTopicsError);
+    });
+}
 async function getItems(sources, after, options = {}) {
   //get the items based by source from the databse to show to the user
 
@@ -86,9 +97,7 @@ async function getItems(sources, after, options = {}) {
       q.Map(
         q.Paginate(q.Union(matchQueries), {
           size: options.size ? options.size : 9, // TODO remove ternary
-          after: after.ref
-            ? [after.ts, q.Ref(q.Collection('articles'), after.ref)]
-            : []
+          after: after.ref ? [after.ts, q.Ref(q.Collection('articles'), after.ref)] : []
         }),
         q.Lambda(['feed', 'ref'], q.Get(q.Var('ref')))
       )
@@ -175,13 +184,7 @@ function deleteOldItems() {
     })
     .then(refs => {
       return client.query(
-        q.Map(
-          refs,
-          q.Lambda(
-            'ref',
-            q.Delete(q.Ref(q.Collection('articles'), q.Var('ref')))
-          )
-        )
+        q.Map(refs, q.Lambda('ref', q.Delete(q.Ref(q.Collection('articles'), q.Var('ref')))))
       );
     })
     .then(deleteQueryRet => {
@@ -199,5 +202,6 @@ module.exports = {
   deleteOldItems: deleteOldItems,
   getLastItemDate: getLastItemDate,
   getItems: getItems,
-  getItemByRef: getItemByRef
+  getItemByRef: getItemByRef,
+  getTopicsFromFeeds: getTopicsFromFeeds
 };

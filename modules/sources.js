@@ -31,13 +31,11 @@ const sources = [
   { name: 'WIRED', about: 'WIRED is where tomorrow is realised' },
   {
     name: 'Futurism',
-    about:
-      'Bringing you the world, the news, products, and narratives of tomorrow, today.'
+    about: 'Bringing you the world, the news, products, and narratives of tomorrow, today.'
   },
   {
     name: 'freeCodeCamp',
-    about:
-      'A nonprofit community that helps you learn to code by building projects.'
+    about: 'A nonprofit community that helps you learn to code by building projects.'
   },
   {
     name: 'Smashing Magazine',
@@ -86,8 +84,7 @@ const sources = [
   },
   {
     name: 'The Wall Street Journal',
-    about:
-      'Coverage of breaking news and current headlines from the US and around the world'
+    about: 'Coverage of breaking news and current headlines from the US and around the world'
   },
   {
     name: 'Surface',
@@ -106,8 +103,7 @@ const sources = [
   },
   {
     name: 'Quanta Magazine',
-    about:
-      'Illuminating basic science and math research through public service journalism.'
+    about: 'Illuminating basic science and math research through public service journalism.'
   },
   {
     name: 'Knowable Magazine',
@@ -409,14 +405,33 @@ async function routeFeedForStories(request, response) {
   response.send(respondeData);
 }
 
-function routeFeedTopics(request, response) {
-  const allTopics = feeds.map(feed => feed.topics).flat();
-  const uniqueTopics = [...new Set(allTopics)];
-  response.send(uniqueTopics);
+async function routeFeedTopics(request, response) {
+  let allTopics = await db.getTopicsFromFeeds().catch(getTopicsFromFeedsError => {
+    console.log(`${getTopicsFromFeedsError} <== getTopicsFromFeeds\n\n`);
+    response.send({
+      status: 'ERROR',
+      data: []
+    });
+    return;
+  });
+
+  if (allTopics) {
+    allTopics = allTopics.data.flat();
+    allTopics = [...new Set(allTopics)];
+    console.log(`${JSON.stringify(allTopics, null, 2)} <== allTopics \n`);
+
+    response.send({
+      status: 'OK',
+      data: allTopics
+    });
+  }
 }
+
+async function routeGetFeeds(request, response) {}
 
 module.exports = {
   checkIfFeedExists: checkIfFeedExists,
   routeFeedForStories: routeFeedForStories,
-  routeFeedTopics: routeFeedTopics
+  routeFeedTopics: routeFeedTopics,
+  routeGetFeeds: routeGetFeeds
 };

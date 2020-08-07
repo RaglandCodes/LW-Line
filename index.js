@@ -1,4 +1,4 @@
-// --------------- dependencies & initialisations ----------
+// --------------- dependencies & initialisations ---------------
 
 const express = require('express');
 const db = require('./modules/database');
@@ -9,11 +9,9 @@ const fs = require('fs');
 const path = require('path');
 const nanoid = require('nanoid');
 
-// --------------- globals ----------
+// --------------- globals ---------------
 
-let lastUpdatedAt;
-
-// --------------- middlewares ----------
+// --------------- middlewares ---------------
 
 // CORS
 app.use(function (req, res, next) {
@@ -22,48 +20,7 @@ app.use(function (req, res, next) {
   next();
 });
 
-// middleware to add new stories
-app.use((req, res, next) => {
-  next();
-
-  // do not add again when already adding
-  if (req.path.indexOf('addNewItems') !== -1) {
-    return;
-  }
-
-  // read from file if unavailable
-  if (!lastUpdatedAt) {
-    fs.readFile(path.join(__dirname, './last_updated.txt'), 'utf8', (err, dateInFile) => {
-      if (err) {
-        lastUpdatedAt = Date.now();
-        return;
-      }
-      lastUpdatedAt = parseInt(dateInFile);
-
-      update();
-    });
-  } else {
-    update();
-  }
-
-  function update(params) {
-    // update frequecy is more that 1 hour
-    if (Date.now() - lastUpdatedAt < 1000 * 60 * 60) {
-      return;
-    }
-
-    console.log('Will update with new stories');
-    routeAddNewItems(req, res);
-    lastUpdatedAt = Date.now();
-    fs.writeFile(path.join(__dirname, './last_updated.txt'), lastUpdatedAt, err => {
-      if (err) {
-        console.log(err);
-      }
-    });
-  }
-});
-
-// --------------- functions ----------
+// --------------- functions ---------------
 
 function routeAddNewItems(request, respone) {
   respone.end('OK');
@@ -87,7 +44,7 @@ function routeAddNewItems(request, respone) {
   }
 }
 
-// --------------- GET requests ----------
+// --------------- GET requests ---------------
 
 app.get('/', (request, response) => {
   response.end('LW Line');
@@ -139,6 +96,8 @@ app.get('/getSources', (request, response) => {
     response.end('ERROR');
   }
 });
+
+app.get('/getFeeds', sourcesModule.routeGetFeeds);
 
 app.get('/feedForStories', sourcesModule.routeFeedForStories);
 app.get('/allFeeds', (request, response) => {

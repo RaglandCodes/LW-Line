@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "clear && nodemon --ignore \"*.json\""
+    "start": "clear && nodemon --ignore \"*.json\"",
+    "test": "mocha"
   },
   "author": "Ragland Asir",
   "license": "ISC",
@@ -17,6 +18,8 @@
     "rss-parser": "^3.7.6"
   },
   "devDependencies": {
-    "nodemon": "^2.0.1"
+    "chai": "*",
+    "mocha": "*",
+    "nodemon": "^2.0.4"
   }
 }
