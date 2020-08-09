@@ -424,14 +424,112 @@ async function routeFeedTopics(request, response) {
       status: 'OK',
       data: allTopics
     });
+    return;
   }
+
+  response.send({
+    status: 'ERROR',
+    data: 'Unforseen error 380'
+  });
 }
 
-async function routeGetFeeds(request, response) {}
+async function routePreviewFeed(request, response) {
+  // returns feedItems and more information of source (if source is there)
+
+  let feed = request.query.feed;
+  // TODO what happens for invalid feed name
+
+  let [feedInfo, feedItems] = await Promise.all([
+    db.getFeedInfo(feed),
+    db.getFeedItems([feed])
+  ]).catch(e => {
+    console.log(`${e} <== e\n\n`);
+
+    response.send({
+      status: 'ERROR',
+      data: 'DB Error 930'
+    });
+    return;
+  });
+
+  after = feedItems.after;
+  feedItems = feedItems.data;
+  feedInfo = feedInfo.data[0].data;
+
+  sourceName = feedInfo.source;
+  let sourceInfo = await db.getSourceInfo(sourceName);
+  sourceInfo = sourceInfo.data[0].data;
+
+  response.send({
+    status: 'OK',
+    data: { sourceInfo: sourceInfo, feed: { items: feedItems, after: after } }
+  });
+}
+
+async function routeGetFeeds(request, response) {
+  let searchTerm = request.query.searchTerm;
+  let searchTopics = [];
+  if (request.query.searchTopics) {
+    searchTopics = JSON.parse(request.query.searchTopics);
+  }
+
+  console.log(`${JSON.stringify(searchTopics, null, 2)} <== searchTopics \n`);
+
+  if (searchTopics.length > 0) {
+    let feeds = await db.searchFeedsByTopic(searchTopics).catch(e => {
+      response.send({
+        status: 'ERROR',
+        data: 'Database Error 182'
+      });
+      return;
+    });
+
+    feeds = feeds.data.map(feed => feed.data);
+
+    response.send({
+      status: 'OK',
+      data: feeds
+    });
+  } else if (searchTerm) {
+    //TODO
+
+    let feeds = await db.searchFeedsByName(searchTerm).catch(e => {
+      console.log(`${e} <== e\n\n`);
+
+      response.send({
+        status: 'ERROR',
+        data: 'DB erros 739'
+      });
+      return;
+    });
+
+    feeds = feeds.data;
+    if (feeds.length === 0) {
+      response.send({
+        status: 'ERROR',
+        data: 'Nothing found'
+      });
+      return;
+    }
+
+    feeds = feeds.map(feed => feed.data);
+
+    response.send({
+      status: 'OK',
+      data: feeds
+    });
+  } else {
+    response.send({
+      status: 'ERROR',
+      data: 'Bad rrequest 016'
+    });
+  }
+}
 
 module.exports = {
   checkIfFeedExists: checkIfFeedExists,
   routeFeedForStories: routeFeedForStories,
   routeFeedTopics: routeFeedTopics,
-  routeGetFeeds: routeGetFeeds
+  routeGetFeeds: routeGetFeeds,
+  routePreviewFeed: routePreviewFeed
 };

@@ -58,15 +58,15 @@ app.get('/deleteOldItems', (query, respone) => {
   db.deleteOldItems();
 });
 
-app.get('/sourceTopics', (request, response) => {
-  //TODO delete this function and route
-  const sources = JSON.parse(fs.readFileSync(path.join(__dirname, './sources.json')));
-  let topics = [...new Set(sources.map(source => source.topics).reduce((a, c) => [...a, ...c]))];
+// app.get('/sourceTopics', (request, response) => {
+//   //TODO delete this function and route
+//   const sources = JSON.parse(fs.readFileSync(path.join(__dirname, './sources.json')));
+//   let topics = [...new Set(sources.map(source => source.topics).reduce((a, c) => [...a, ...c]))];
 
-  //topics is array of the topics in the sources.json file
+//   //topics is array of the topics in the sources.json file
 
-  response.send(topics);
-});
+//   response.send(topics);
+// });
 
 // Returns a Set of all topics
 app.get('/feedTopics', sourcesModule.routeFeedTopics);
@@ -84,7 +84,7 @@ app.get('/getSources', (request, response) => {
     );
     console.log(`${JSON.stringify(results, null, 2)} <= results`);
 
-    response.send(results);
+    response.send({ status: 'OK', data: results });
   } else if (searchTopics) {
     searchTopics = searchTopics.split('AaNnDd');
     let searchResult = sources.filter(source => {
@@ -100,22 +100,22 @@ app.get('/getSources', (request, response) => {
 app.get('/getFeeds', sourcesModule.routeGetFeeds);
 
 app.get('/feedForStories', sourcesModule.routeFeedForStories);
-app.get('/allFeeds', (request, response) => {
-  //TODO delete this
-  const sources = JSON.parse(fs.readFileSync(path.join(__dirname, './sources.json')));
-  response.send(sources);
-});
+
+// app.get('/allFeeds', (request, response) => {
+//   //TODO delete this
+//   const sources = JSON.parse(fs.readFileSync(path.join(__dirname, './sources.json')));
+//   response.send(sources);
+// });
 
 app.get('/singleItem', (request, response) => {
   let id = request.query.id;
 
   db.getItemByRef(id)
     .then(ret => {
-      response.send(ret);
+      response.send({ status: 'OK', data: ret });
     })
     .catch(getSingleItemError => {
-      response.send('ERROR');
-      console.log(`${getSingleItemError} <= getSingleItemError`);
+      response.send({ status: 'ERROR', data: `DB Error 826 ${getSingleItemError}` });
     });
 });
 
@@ -139,19 +139,31 @@ app.get('/previewSource', (request, respone) => {
     });
 });
 
+app.get('/previewFeed', sourcesModule.routePreviewFeed);
+
 app.get('/getItems', (request, response) => {
   // Gets hit from the front-end
 
-  let subscriptions = request.query.subscriptions.split('AaNnDd');
-  let after = { ref: request.query.afterRef, ts: request.query.afterTs };
-  //console.log(`${JSON.stringify(after, null, 2)} <= after`);
+  let subscriptions = JSON.parse(request.query.subscriptions);
+  let after = [];
+  console.log(`${request.query.after} <== req.query.after\n\n`);
 
-  db.getItems(subscriptions, after)
+  if (request.query.after !== undefined) {
+    console.log('passed');
+    jsonAfter = JSON.parse(request.query.after);
+    after = [jsonAfter.ts, jsonAfter.ref];
+  }
+
+  console.log(`${JSON.stringify(after, null, 2)} <= after`);
+
+  db.getFeedItems(subscriptions, { after: after })
     .then(responseData => {
-      response.send(responseData);
+      response.send({ status: 'OK', data: responseData });
     })
     .catch(error => {
-      response.end('ERROR');
+      console.log(`${error} <== error\n\n`);
+
+      response.send({ status: 'ERROR', data: '839' });
     });
 });
 

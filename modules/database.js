@@ -81,6 +81,150 @@ async function getTopicsFromFeeds() {
       throw new Error('ERROR  ' + getFeedTopicsError);
     });
 }
+
+async function getSourceInfo(sourceName) {
+  return client
+    .query(
+      q.Map(
+        q.Paginate(q.Match(q.Index('getSourceByName'), sourceName), {
+          size: 1
+        }),
+        q.Lambda(['ref'], q.Get(q.Var('ref')))
+      )
+    )
+    .then(ret => {
+      return ret;
+    })
+    .catch(e => {
+      throw new Error('ERROR  ' + e + '871');
+    });
+}
+
+async function getFeedInfo(feedName) {
+  return client
+    .query(
+      q.Map(
+        q.Paginate(q.Match(q.Index('getFeedByNameIndex'), feedName), {
+          size: 1
+        }),
+        q.Lambda(['ref'], q.Get(q.Var('ref')))
+      )
+    )
+    .then(ret => {
+      return ret;
+    })
+    .catch(e => {
+      throw new Error('ERROR  ' + e + '871');
+    });
+}
+
+async function searchFeedsByTopic(topics) {
+  let matchQueries = topics.map(topic => q.Match(q.Index('searchFeedsByTopics'), topic));
+
+  return client
+    .query(q.Map(q.Paginate(q.Union(matchQueries)), q.Lambda(['ref'], q.Get(q.Var('ref')))))
+    .then(ret => {
+      return ret;
+    })
+    .catch(searchFeedsByTopicError => {
+      throw new Error('ERROR  ' + searchFeedsByTopicError);
+    });
+}
+
+async function searchFeedsByName(searchQuery) {
+  searchQuery = searchQuery.toLowerCase();
+  console.log(`${searchQuery} <== searchTerm\n\n`);
+
+  return client
+    .query(
+      q.Map(
+        q.Filter(
+          q.Paginate(q.Match(q.Index('feedNameSearchIndex'))),
+          q.Lambda(['name', 'ref'], q.ContainsStr(q.LowerCase(q.Var('name')), searchQuery))
+        ),
+        q.Lambda(['feed', 'ref'], q.Get(q.Var('ref')))
+      )
+    )
+    .then(ret => {
+      return ret;
+    })
+    .catch(err => {
+      throw new Error(`ERROR couldn't search for ${searchQuery}`);
+    });
+}
+
+async function getFeedItems(feedNames, { ...options } = {}) {
+  const defaultOptions = {
+    size: 9,
+    after: []
+  };
+
+  options = {
+    ...defaultOptions,
+    ...options
+  };
+
+  console.log(`${JSON.stringify(options, null, 2)} <== options in getFeed\n`);
+
+  if (options.after.length) {
+    options.after = [options.after[0], q.Ref(q.Collection('articles'), options.after[1])];
+  }
+
+  let matchQueries = feedNames.map(feedName =>
+    q.Match(q.Index('article_search_feed_sort_date'), feedName)
+  );
+
+  return client
+    .query(
+      q.Map(
+        q.Paginate(q.Union(matchQueries), {
+          size: options.size,
+          after: options.after
+          //after: after.ref ? [after.ts, q.Ref(q.Collection('articles'), after.ref)] : []
+        }),
+        q.Lambda(['feed', 'ref'], q.Get(q.Var('ref')))
+      )
+    )
+    .then(ret => JSON.parse(JSON.stringify(ret)))
+    .then(ret => {
+      //console.log(`${JSON.stringify(ret)} <== getItems query ret\n\n`);
+      //fs.writeFileSync(path.join(__dirname, './aa.json'), JSON.stringify(ret));
+      //console.log(`${ret.data.length} <== ret.data.length\n\n ==> ${feedName}`);
+
+      if (ret.data.length === 0) {
+        throw new Error('ERROR');
+        return;
+      }
+
+      //TODO nullish coalasence
+
+      //If there's no after, put an empty string
+      //TODO handle this in front end
+      let afterRef = ret['after'] ? ret['after'][1]['@ref']['id'] : '';
+
+      return {
+        data: ret.data.map(item => ({
+          id: item['ref']['@ref']['id'],
+          title: item['data']['title'],
+          source: item['data']['source'],
+          date: item['data']['date'],
+          topics: [...item['data']['topics']],
+          link: item['data']['link'],
+          image: item['data']['image'],
+          description: item['data']['description'],
+          metaDescription: item['data']['metaDescription'],
+          ampURL: item['data']['ampURL']
+        })),
+        after: {
+          ref: afterRef,
+          ts: ret['after'] ? ret['after'][0] : ''
+        }
+      };
+    })
+    .catch(getItemsError => {
+      throw new Error(`ERROR due to ${getItemsError}`);
+    });
+}
 async function getItems(sources, after, options = {}) {
   //get the items based by source from the databse to show to the user
 
@@ -139,7 +283,7 @@ async function getItems(sources, after, options = {}) {
       };
     })
     .catch(getItemsError => {
-      throw new Error(`ERROR due to ${getItemsError}`);
+      throw new Error(`ERROR due to ${getItemsError} 892`);
     });
 } // end of function getItems
 async function getLastItemDate(feed) {
@@ -203,5 +347,10 @@ module.exports = {
   getLastItemDate: getLastItemDate,
   getItems: getItems,
   getItemByRef: getItemByRef,
-  getTopicsFromFeeds: getTopicsFromFeeds
+  getTopicsFromFeeds: getTopicsFromFeeds,
+  searchFeedsByTopic: searchFeedsByTopic,
+  getFeedItems: getFeedItems,
+  getFeedInfo: getFeedInfo,
+  getSourceInfo: getSourceInfo,
+  searchFeedsByName: searchFeedsByName
 };
