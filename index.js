@@ -71,31 +71,31 @@ app.get('/deleteOldItems', (query, respone) => {
 // Returns a Set of all topics
 app.get('/feedTopics', sourcesModule.routeFeedTopics);
 
-app.get('/getSources', (request, response) => {
-  let searchTerm = request.query.searchTerm;
-  let searchTopics = request.query.searchTopics;
-  const sources = JSON.parse(fs.readFileSync(path.join(__dirname, './sources.json')));
+// app.get('/getSources', (request, response) => {
+//   let searchTerm = request.query.searchTerm;
+//   let searchTopics = request.query.searchTopics;
+//   const sources = JSON.parse(fs.readFileSync(path.join(__dirname, './sources.json')));
 
-  if (searchTerm) {
-    const sources = JSON.parse(fs.readFileSync(path.join(__dirname, './sources.json')));
+//   if (searchTerm) {
+//     const sources = JSON.parse(fs.readFileSync(path.join(__dirname, './sources.json')));
 
-    let results = sources.filter(
-      source => source.feed.toLowerCase().indexOf(searchTerm.toLowerCase()) !== -1
-    );
-    console.log(`${JSON.stringify(results, null, 2)} <= results`);
+//     let results = sources.filter(
+//       source => source.feed.toLowerCase().indexOf(searchTerm.toLowerCase()) !== -1
+//     );
+//     console.log(`${JSON.stringify(results, null, 2)} <= results`);
 
-    response.send({ status: 'OK', data: results });
-  } else if (searchTopics) {
-    searchTopics = searchTopics.split('AaNnDd');
-    let searchResult = sources.filter(source => {
-      return source.topics.filter(topic => searchTopics.includes(topic)).length;
-    });
+//     response.send({ status: 'OK', data: results });
+//   } else if (searchTopics) {
+//     searchTopics = searchTopics.split('AaNnDd');
+//     let searchResult = sources.filter(source => {
+//       return source.topics.filter(topic => searchTopics.includes(topic)).length;
+//     });
 
-    response.send(searchResult);
-  } else {
-    response.end('ERROR');
-  }
-});
+//     response.send(searchResult);
+//   } else {
+//     response.end('ERROR');
+//   }
+// });
 
 app.get('/getFeeds', sourcesModule.routeGetFeeds);
 
@@ -115,29 +115,30 @@ app.get('/singleItem', (request, response) => {
       response.send({ status: 'OK', data: ret });
     })
     .catch(getSingleItemError => {
-      response.send({ status: 'ERROR', data: `DB Error 826 ${getSingleItemError}` });
+      console.log(`${getSingleItemError} <== getSingleItemError\n\n`);
+      response.send({ status: 'ERROR', data: `DB Error 826` });
     });
 });
 
-app.get('/previewSource', (request, respone) => {
-  let searchSource = request.query.source;
-  let after = { ref: request.query.afterRef, ts: request.query.afterTs };
+// app.get('/previewSource', (request, respone) => {
+//   let searchSource = request.query.source;
+//   let after = { ref: request.query.afterRef, ts: request.query.afterTs };
 
-  const sources = JSON.parse(fs.readFileSync(path.join(__dirname, './sources.json')));
+//   const sources = JSON.parse(fs.readFileSync(path.join(__dirname, './sources.json')));
 
-  let selectedSource = sources.filter(source => source.feed === searchSource)[0];
+//   let selectedSource = sources.filter(source => source.feed === searchSource)[0];
 
-  db.getItems([searchSource], after)
-    .then(responseData => {
-      selectedSource = { ...selectedSource, items: responseData };
+//   db.getItems([searchSource], after)
+//     .then(responseData => {
+//       selectedSource = { ...selectedSource, items: responseData };
 
-      respone.send(selectedSource);
-    })
-    .catch(previewSourceDBError => {
-      console.log(`${previewSourceDBError} <= previewSourceDBError`);
-      respone.end('ERROR');
-    });
-});
+//       respone.send(selectedSource);
+//     })
+//     .catch(previewSourceDBError => {
+//       console.log(`${previewSourceDBError} <= previewSourceDBError`);
+//       respone.end('ERROR');
+//     });
+// });
 
 app.get('/previewFeed', sourcesModule.routePreviewFeed);
 
@@ -191,7 +192,9 @@ app.listen(5151, () => {
   console.log('Running @ port 5151');
 });
 
-// This is to be able to remix on Glitch
+module.exports = app; // for testing
+
+// This is to be able to host on Glitch
 // https://glitch.com/~lw-line-backend
 /*
 

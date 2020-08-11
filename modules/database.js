@@ -133,7 +133,6 @@ async function searchFeedsByTopic(topics) {
 
 async function searchFeedsByName(searchQuery) {
   searchQuery = searchQuery.toLowerCase();
-  console.log(`${searchQuery} <== searchTerm\n\n`);
 
   return client
     .query(

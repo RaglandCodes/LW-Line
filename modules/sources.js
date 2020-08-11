@@ -418,7 +418,6 @@ async function routeFeedTopics(request, response) {
   if (allTopics) {
     allTopics = allTopics.data.flat();
     allTopics = [...new Set(allTopics)];
-    console.log(`${JSON.stringify(allTopics, null, 2)} <== allTopics \n`);
 
     response.send({
       status: 'OK',
@@ -473,8 +472,6 @@ async function routeGetFeeds(request, response) {
     searchTopics = JSON.parse(request.query.searchTopics);
   }
 
-  console.log(`${JSON.stringify(searchTopics, null, 2)} <== searchTopics \n`);
-
   if (searchTopics.length > 0) {
     let feeds = await db.searchFeedsByTopic(searchTopics).catch(e => {
       response.send({
@@ -491,7 +488,13 @@ async function routeGetFeeds(request, response) {
       data: feeds
     });
   } else if (searchTerm) {
-    //TODO
+    if (searchTerm.length < 2) {
+      response.send({
+        status: 'ERROR',
+        data: 'Query too short'
+      });
+      return;
+    }
 
     let feeds = await db.searchFeedsByName(searchTerm).catch(e => {
       console.log(`${e} <== e\n\n`);
