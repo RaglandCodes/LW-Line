@@ -82,6 +82,30 @@ async function getTopicsFromFeeds() {
     });
 }
 
+async function* yieldAllFeeds() {
+  let after = [];
+  while (after) {
+    let ret = await client
+      .query(
+        q.Map(
+          q.Paginate(q.Match(q.Index('getFeedsIndex')), { size: 7, after: after }),
+          q.Lambda('ref', q.Get(q.Var('ref')))
+        )
+      )
+      .then(ret => {
+        after = ret.after;
+        return ret.data;
+      })
+      .catch(err => {
+        console.log(err);
+        console.log('^err^');
+        return [];
+      });
+
+    yield ret;
+  }
+}
+
 async function getSourceInfo(sourceName) {
   return client
     .query(
@@ -351,5 +375,6 @@ module.exports = {
   getFeedItems: getFeedItems,
   getFeedInfo: getFeedInfo,
   getSourceInfo: getSourceInfo,
-  searchFeedsByName: searchFeedsByName
+  searchFeedsByName: searchFeedsByName,
+  yieldAllFeeds: yieldAllFeeds
 };

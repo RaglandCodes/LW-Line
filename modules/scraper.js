@@ -38,7 +38,7 @@ function getMeta(item) {
           resolve({
             ...item
           });
-          console.log(`${item.source} <== Bad meta causing ${err} \n\n`);
+          console.log(`${item.feed} <== Bad meta causing ${err} \n\n`);
         }
       }
     ); // end of fetch
@@ -56,19 +56,53 @@ async function getDataFromLink(feedLink) {
   });
   return feedData;
 }
-async function getNewItems(source) {
+
+async function routeUpdateAllFeeds(request, response) {
+  response.end('OK');
+
+  let feedsGenerator = db.yieldAllFeeds();
+
+  for await (let feeds of feedsGenerator) {
+    if (feeds !== undefined) {
+      feeds = feeds.map(feed => feed.data);
+      //console.log(`${JSON.stringify(feeds, null, 2)} <== feeds \n`);
+
+      for await (const feed of feeds) {
+        getNewItems(feed)
+          .then(newItems => {
+            console.count('Finished scrapping');
+            if (newItems.length === 0) {
+              console.log(`N0t adding anything for ${feed.name}`);
+            } else {
+              console.log(`${JSON.stringify(newItems, null, 2)} <== newItems \n`);
+
+              //db.addMultiple(newItems);
+            }
+          })
+          .catch(cronError => {
+            console.log(`${cronError} <== cronError \n`);
+          });
+      }
+    } else {
+      console.log('mistake happened');
+    }
+  }
+  console.log('over');
+}
+
+async function getNewItems(feed) {
   let parser = new Parser();
   let [newData, lastItemDate] = await Promise.all([
-    parser.parseURL(source['rssLink']),
-    db.getLastItemDate(source['feed'])
+    parser.parseURL(feed.feedLink),
+    db.getLastItemDate(feed.name)
   ]).catch(getNewItemsError => {
-    console.log(`${getNewItemsError} <= getNewItemsError ${source}`);
+    console.log(`${getNewItemsError} <= getNewItemsError ${feed.name}`);
     return [];
   });
 
   if (!newData) {
-    console.log('New data was falsy for' + source['feed']);
-    console.log(`${newData} <== newData`);
+    console.log('New data was falsy for' + feed.name);
+    console.log(`${newData} <== falsy newData`);
 
     return [];
   }
@@ -76,14 +110,14 @@ async function getNewItems(source) {
     return new Date(item.pubDate) > new Date(lastItemDate);
   });
 
-  console.log(`${newData.length} <== newData.length ==> ${source.feed}`);
+  console.log(`${newData.length} <== newData.length ==> ${feed.name}`);
 
   let scrappedItems = newData.map(item => ({
     title: item.title,
     contentSnippet: item.contentSnippet,
-    topics: item.categories ? [...item.categories, ...source.topics] : [...source.topics],
-    source: source.source,
-    feed: source.feed,
+    topics: item.categories ? [...item.categories, ...feed.topics] : [...feed.topics],
+    source: feed.source,
+    feed: feed.name,
     date: new Date(item.pubDate).toISOString(),
     link: item.link
   }));
@@ -97,5 +131,6 @@ async function getNewItems(source) {
 
 module.exports = {
   getNewItems: getNewItems,
-  getDataFromLink: getDataFromLink
+  getDataFromLink: getDataFromLink,
+  routeUpdateAllFeeds: routeUpdateAllFeeds
 };

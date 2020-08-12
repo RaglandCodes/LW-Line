@@ -51,7 +51,7 @@ app.get('/', (request, response) => {
 });
 
 app.get('/addNewItems', routeAddNewItems);
-
+app.get('/updateAllFeeds', scrapper.routeUpdateAllFeeds);
 app.get('/deleteOldItems', (query, respone) => {
   // Gets hit at periodic intervals to delete old items
   respone.end('(•‿•)');

@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "clear && nodemon --ignore \"*.json\"",
+    "start": "node index.js",
+    "watch": "clear && nodemon --ignore \"*.json\"",
     "test": "mocha"
   },
   "author": "Ragland Asir",
@@ -22,5 +23,8 @@
     "chai-http": "^4.3.0",
     "mocha": "*",
     "nodemon": "^2.0.4"
+  },
+  "engines": {
+    "node": "12.x"
   }
 }
