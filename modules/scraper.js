@@ -38,23 +38,97 @@ function getMeta(item) {
           resolve({
             ...item
           });
-          console.log(`${item.feed} <== Bad meta causing ${err} \n\n`);
+          console.warn(`${item.feed} <== Bad meta causing ${err} \n\n`);
         }
       }
     ); // end of fetch
   }); // end of return new promise
 } // end of function getMeta
 
-async function getDataFromLink(feedLink) {
-  let parser = new Parser();
-  let feedData;
-  console.log(`${feedLink} <== feedLink`);
+async function routeAddFeedFromLink(request, response) {
+  let feedLink = request.query.feedLink;
+  let userId = request.query.userId;
 
-  feedData = await parser.parseURL(feedLink).catch(feedDataError => {
-    console.log(`${feedDataError} <== feedDataError`);
-    return [];
+  if (!userId || userId === 'admin') {
+    response.send({
+      status: 'ERROR',
+      body: 'Bad auth'
+    });
+    return;
+  }
+
+  let existingFeed = await db.searchFeedsByFeedLink(feedLink).catch(e => {
+    response.send({
+      status: 'ERROR',
+      body: 'DB Error'
+    });
+
+    return;
   });
-  return feedData;
+
+  if (existingFeed.data.length) {
+    // TODO check if created by admin
+    response.send({
+      status: 'ERROR',
+      body: 'Already Exists'
+    });
+    return;
+  }
+
+  let parser = new Parser();
+  let feedData = await parser.parseURL(feedLink).catch(feedDataError => {
+    console.error(feedDataError);
+    response.send({
+      status: 'ERROR',
+      body: `Couldn't scrape that feed`
+    });
+    return;
+  });
+
+  let newFeed = {
+    name: feedData.title,
+    feedLink: feedLink,
+    siteLink: feedData.feedUrl,
+    about: feedData.link,
+    createdBy: [userId],
+    topics: [],
+    image: feedData.image
+  };
+
+  let feedItems = feedData.items.map(item => ({
+    title: item.title,
+    contentSnippet: item.contentSnippet,
+    topics: item.categories ? [...item.categories] : [],
+    feed: newFeed.name,
+    date: new Date(item.pubDate).toISOString(),
+    link: item.link
+  }));
+
+  if (feedItems.length === 0) {
+    response.send({
+      status: 'ERROR',
+      body: `Couldn't scrape that feed`
+    });
+    return;
+  }
+
+  let feedItemsWithMetaData = await Promise.all(feedItems.map(item => getMeta(item)));
+
+  // db.addMultiple(feedItemsWithMetaData);
+
+  response.send(newFeed);
+}
+
+async function getDataFromLink(feedLink) {
+  console.log('noooo');
+  // let parser = new Parser();
+  // let feedData;
+  // console.log(`${feedLink} <== feedLink`);
+  // feedData = await parser.parseURL(feedLink).catch(feedDataError => {
+  //   console.log(`${feedDataError} <== feedDataError`);
+  //   return [];
+  // });
+  // return feedData;
 }
 
 async function routeUpdateAllFeeds(request, response) {
@@ -74,9 +148,7 @@ async function routeUpdateAllFeeds(request, response) {
             if (newItems.length === 0) {
               console.log(`N0t adding anything for ${feed.name}`);
             } else {
-              console.log(`${JSON.stringify(newItems, null, 2)} <== newItems \n`);
-
-              //db.addMultiple(newItems);
+              db.addMultiple(newItems);
             }
           })
           .catch(cronError => {
@@ -96,7 +168,8 @@ async function getNewItems(feed) {
     parser.parseURL(feed.feedLink),
     db.getLastItemDate(feed.name)
   ]).catch(getNewItemsError => {
-    console.log(`${getNewItemsError} <= getNewItemsError ${feed.name}`);
+    console.error(getNewItemsError);
+    console.warn(`Error in ${feed.name}`);
     return [];
   });
 
@@ -132,5 +205,6 @@ async function getNewItems(feed) {
 module.exports = {
   getNewItems: getNewItems,
   getDataFromLink: getDataFromLink,
-  routeUpdateAllFeeds: routeUpdateAllFeeds
+  routeUpdateAllFeeds: routeUpdateAllFeeds,
+  routeAddFeedFromLink: routeAddFeedFromLink
 };

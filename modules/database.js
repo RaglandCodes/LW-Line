@@ -97,8 +97,8 @@ async function* yieldAllFeeds() {
         return ret.data;
       })
       .catch(err => {
-        console.log(err);
-        console.log('^err^');
+        console.error(err);
+        console.info('^err^');
         return [];
       });
 
@@ -142,6 +142,25 @@ async function getFeedInfo(feedName) {
     });
 }
 
+async function searchFeedsByFeedLink(feedLink) {
+  return client
+    .query(
+      q.Map(
+        q.Paginate(q.Match(q.Index('getFeedByLinkIndex'), feedLink), {
+          size: 1
+        }),
+        q.Lambda(['ref'], q.Get(q.Var('ref')))
+      )
+    )
+    .then(ret => {
+      return ret;
+    })
+    .catch(e => {
+      console.error(e);
+
+      throw new Error('Database error');
+    });
+}
 async function searchFeedsByTopic(topics) {
   let matchQueries = topics.map(topic => q.Match(q.Index('searchFeedsByTopics'), topic));
 
@@ -186,8 +205,6 @@ async function getFeedItems(feedNames, { ...options } = {}) {
     ...defaultOptions,
     ...options
   };
-
-  console.log(`${JSON.stringify(options, null, 2)} <== options in getFeed\n`);
 
   if (options.after.length) {
     options.after = [options.after[0], q.Ref(q.Collection('articles'), options.after[1])];
@@ -273,7 +290,7 @@ async function getItems(sources, after, options = {}) {
     .then(ret => {
       //console.log(`${JSON.stringify(ret)} <== getItems query ret\n\n`);
       //fs.writeFileSync(path.join(__dirname, './aa.json'), JSON.stringify(ret));
-      console.log(`${ret.data.length} <== ret.data.length\n\n ==> ${sources}`);
+      //   console.log(`${ret.data.length} <== ret.data.length\n\n ==> ${sources}`);
 
       if (ret.data.length === 0) {
         throw new Error('ERROR');
@@ -355,7 +372,7 @@ function deleteOldItems() {
       );
     })
     .then(deleteQueryRet => {
-      console.log(`Deleted ${deleteQueryRet.length} items\n\n`);
+      console.info(`Deleted ${deleteQueryRet.length} items\n\n`);
     })
     .catch(e => {
       console.log(`${e} <== Delete pagination error\n\n`);
@@ -376,5 +393,6 @@ module.exports = {
   getFeedInfo: getFeedInfo,
   getSourceInfo: getSourceInfo,
   searchFeedsByName: searchFeedsByName,
-  yieldAllFeeds: yieldAllFeeds
+  yieldAllFeeds: yieldAllFeeds,
+  searchFeedsByFeedLink: searchFeedsByFeedLink
 };

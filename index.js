@@ -22,27 +22,27 @@ app.use(function (req, res, next) {
 
 // --------------- functions ---------------
 
-function routeAddNewItems(request, respone) {
-  respone.end('OK');
-  console.log(`${request.path} <== request.path`);
-  const sources = JSON.parse(fs.readFileSync(path.join(__dirname, './sources.json')));
+// function routeAddNewItems(request, respone) {
+//   respone.end('OK');
+//   console.log(`${request.path} <== request.path`);
+//   const sources = JSON.parse(fs.readFileSync(path.join(__dirname, './sources.json')));
 
-  for (const source of sources) {
-    scrapper
-      .getNewItems(source)
-      .then(newItems => {
-        console.count('Finished scrapping');
-        if (newItems.length === 0) {
-          console.log(`N0t adding anything for ${source.feed}`);
-        } else {
-          db.addMultiple(newItems);
-        }
-      })
-      .catch(cronError => {
-        console.log(`${cronError} <== cronError \n`);
-      });
-  }
-}
+//   for (const source of sources) {
+//     scrapper
+//       .getNewItems(source)
+//       .then(newItems => {
+//         console.count('Finished scrapping');
+//         if (newItems.length === 0) {
+//           console.log(`N0t adding anything for ${source.feed}`);
+//         } else {
+//           db.addMultiple(newItems);
+//         }
+//       })
+//       .catch(cronError => {
+//         console.log(`${cronError} <== cronError \n`);
+//       });
+//   }
+// }
 
 // --------------- GET requests ---------------
 
@@ -50,7 +50,7 @@ app.get('/', (request, response) => {
   response.end('LW Line');
 });
 
-app.get('/addNewItems', routeAddNewItems);
+// app.get('/addNewItems', routeAddNewItems);
 app.get('/updateAllFeeds', scrapper.routeUpdateAllFeeds);
 app.get('/deleteOldItems', (query, respone) => {
   // Gets hit at periodic intervals to delete old items
@@ -58,54 +58,12 @@ app.get('/deleteOldItems', (query, respone) => {
   db.deleteOldItems();
 });
 
-// app.get('/sourceTopics', (request, response) => {
-//   //TODO delete this function and route
-//   const sources = JSON.parse(fs.readFileSync(path.join(__dirname, './sources.json')));
-//   let topics = [...new Set(sources.map(source => source.topics).reduce((a, c) => [...a, ...c]))];
-
-//   //topics is array of the topics in the sources.json file
-
-//   response.send(topics);
-// });
-
 // Returns a Set of all topics
 app.get('/feedTopics', sourcesModule.routeFeedTopics);
-
-// app.get('/getSources', (request, response) => {
-//   let searchTerm = request.query.searchTerm;
-//   let searchTopics = request.query.searchTopics;
-//   const sources = JSON.parse(fs.readFileSync(path.join(__dirname, './sources.json')));
-
-//   if (searchTerm) {
-//     const sources = JSON.parse(fs.readFileSync(path.join(__dirname, './sources.json')));
-
-//     let results = sources.filter(
-//       source => source.feed.toLowerCase().indexOf(searchTerm.toLowerCase()) !== -1
-//     );
-//     console.log(`${JSON.stringify(results, null, 2)} <= results`);
-
-//     response.send({ status: 'OK', data: results });
-//   } else if (searchTopics) {
-//     searchTopics = searchTopics.split('AaNnDd');
-//     let searchResult = sources.filter(source => {
-//       return source.topics.filter(topic => searchTopics.includes(topic)).length;
-//     });
-
-//     response.send(searchResult);
-//   } else {
-//     response.end('ERROR');
-//   }
-// });
 
 app.get('/getFeeds', sourcesModule.routeGetFeeds);
 
 app.get('/feedForStories', sourcesModule.routeFeedForStories);
-
-// app.get('/allFeeds', (request, response) => {
-//   //TODO delete this
-//   const sources = JSON.parse(fs.readFileSync(path.join(__dirname, './sources.json')));
-//   response.send(sources);
-// });
 
 app.get('/singleItem', (request, response) => {
   let id = request.query.id;
@@ -115,7 +73,8 @@ app.get('/singleItem', (request, response) => {
       response.send({ status: 'OK', data: ret });
     })
     .catch(getSingleItemError => {
-      console.log(`${getSingleItemError} <== getSingleItemError\n\n`);
+      console.error(getSingleItemError);
+      console.info(`^getSingleItemError\n\n`);
       response.send({ status: 'ERROR', data: `DB Error 826` });
     });
 });
@@ -150,13 +109,9 @@ app.get('/getItems', (request, response) => {
   console.log(`${request.query.after} <== req.query.after\n\n`);
 
   if (request.query.after !== undefined) {
-    console.log('passed');
     jsonAfter = JSON.parse(request.query.after);
     after = [jsonAfter.ts, jsonAfter.ref];
   }
-
-  console.log(`${JSON.stringify(after, null, 2)} <= after`);
-
   db.getFeedItems(subscriptions, { after: after })
     .then(responseData => {
       response.send({ status: 'OK', data: responseData });
@@ -168,28 +123,12 @@ app.get('/getItems', (request, response) => {
     });
 });
 
-app.get('/feedFromLink', (request, response) => {
-  // Returns feed items given an RSS link
+app.get('/addFeedFromLink', scrapper.routeAddFeedFromLink);
 
-  const requestLink = request.query.feedLink;
-  if (sourcesModule.checkIfFeedExists(requestLink)) {
-    response.send({ message: 'Normal Exists' });
-    return;
-  }
+app.listen(process.env.PORT, () => {
+  // TODO make this same as the Glitch one and the remove
 
-  scrapper
-    .getDataFromLink(requestLink)
-    .then(responseData => {
-      response.send(responseData);
-    })
-    .catch(feedFromLinkError => {
-      console.log(`${feedFromLinkError} <== feedFromLinkError`);
-      response.send([]);
-    });
-});
-
-app.listen(5151, () => {
-  console.log('Running @ port 5151');
+  console.log(`Running @ port ${process.env.PORT}`);
 });
 
 module.exports = app; // for testing

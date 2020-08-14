@@ -5,8 +5,9 @@
   "main": "index.js",
   "scripts": {
     "start": "node index.js",
-    "watch": "clear && nodemon --ignore \"*.json\"",
-    "test": "mocha"
+    "watch": "nodemon --ignore \"*.json\"",
+    "test": "mocha",
+    "test:coverage": "nyc mocha"
   },
   "author": "Ragland Asir",
   "license": "ISC",
@@ -22,7 +23,8 @@
     "chai": "*",
     "chai-http": "^4.3.0",
     "mocha": "*",
-    "nodemon": "^2.0.4"
+    "nodemon": "^2.0.4",
+    "nyc": "^15.1.0"
   },
   "engines": {
     "node": "12.x"

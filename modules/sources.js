@@ -1,7 +1,7 @@
 // --------------- dependencies & initialisations ----------
 
-const fs = require('fs');
-const path = require('path');
+// const fs = require('fs');
+// const path = require('path');
 const db = require('./database');
 
 const sources = [
@@ -382,16 +382,16 @@ const feeds = [
 // If we have this feed in sources file, return true.
 // This is used when user wants to add their own feed
 
-function checkIfFeedExists(feedLink) {
-  // const sources = JSON.parse(
-  //   fs.readFileSync(path.join(__dirname, '../sources.json'))
-  // );
-  // let existingSource = sources.filter(source => source['rssLink'] === feedLink);
+// function checkIfFeedExists(feedLink) {
+//   // const sources = JSON.parse(
+//   //   fs.readFileSync(path.join(__dirname, '../sources.json'))
+//   // );
+//   // let existingSource = sources.filter(source => source['rssLink'] === feedLink);
 
-  let existingFeed = feeds.filter(feed => feed['rssLink'] === feedLink);
+//   let existingFeed = feeds.filter(feed => feed['rssLink'] === feedLink);
 
-  return existingFeed.length !== 0;
-}
+//   return existingFeed.length !== 0;
+// }
 
 async function routeFeedForStories(request, response) {
   let respondeData = await Promise.all(
@@ -497,7 +497,7 @@ async function routeGetFeeds(request, response) {
     }
 
     let feeds = await db.searchFeedsByName(searchTerm).catch(e => {
-      console.log(`${e} <== e\n\n`);
+      console.error(e);
 
       response.send({
         status: 'ERROR',
@@ -530,7 +530,7 @@ async function routeGetFeeds(request, response) {
 }
 
 module.exports = {
-  checkIfFeedExists: checkIfFeedExists,
+  // checkIfFeedExists: checkIfFeedExists,
   routeFeedForStories: routeFeedForStories,
   routeFeedTopics: routeFeedTopics,
   routeGetFeeds: routeGetFeeds,
