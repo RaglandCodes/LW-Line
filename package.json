@@ -16,7 +16,7 @@
     "express": "^4.17.1",
     "faunadb": "^2.10.0",
     "metafetch": "^1.9.3",
-    "nanoid": "^3.1.7",
+    "nanoid": "^2.0.1",
     "rss-parser": "^3.7.6"
   },
   "devDependencies": {

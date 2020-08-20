@@ -5,11 +5,6 @@ const db = require('./modules/database');
 const scrapper = require('./modules/scraper');
 const app = express(); //.use(bodyParser.json());
 const sourcesModule = require('./modules/sources');
-const fs = require('fs');
-const path = require('path');
-const nanoid = require('nanoid');
-
-// --------------- globals ---------------
 
 // --------------- middlewares ---------------
 
@@ -20,37 +15,12 @@ app.use(function (req, res, next) {
   next();
 });
 
-// --------------- functions ---------------
-
-// function routeAddNewItems(request, respone) {
-//   respone.end('OK');
-//   console.log(`${request.path} <== request.path`);
-//   const sources = JSON.parse(fs.readFileSync(path.join(__dirname, './sources.json')));
-
-//   for (const source of sources) {
-//     scrapper
-//       .getNewItems(source)
-//       .then(newItems => {
-//         console.count('Finished scrapping');
-//         if (newItems.length === 0) {
-//           console.log(`N0t adding anything for ${source.feed}`);
-//         } else {
-//           db.addMultiple(newItems);
-//         }
-//       })
-//       .catch(cronError => {
-//         console.log(`${cronError} <== cronError \n`);
-//       });
-//   }
-// }
-
 // --------------- GET requests ---------------
 
 app.get('/', (request, response) => {
   response.end('LW Line');
 });
 
-// app.get('/addNewItems', routeAddNewItems);
 app.get('/updateAllFeeds', scrapper.routeUpdateAllFeeds);
 app.get('/deleteOldItems', (query, respone) => {
   // Gets hit at periodic intervals to delete old items
@@ -79,31 +49,9 @@ app.get('/singleItem', (request, response) => {
     });
 });
 
-// app.get('/previewSource', (request, respone) => {
-//   let searchSource = request.query.source;
-//   let after = { ref: request.query.afterRef, ts: request.query.afterTs };
-
-//   const sources = JSON.parse(fs.readFileSync(path.join(__dirname, './sources.json')));
-
-//   let selectedSource = sources.filter(source => source.feed === searchSource)[0];
-
-//   db.getItems([searchSource], after)
-//     .then(responseData => {
-//       selectedSource = { ...selectedSource, items: responseData };
-
-//       respone.send(selectedSource);
-//     })
-//     .catch(previewSourceDBError => {
-//       console.log(`${previewSourceDBError} <= previewSourceDBError`);
-//       respone.end('ERROR');
-//     });
-// });
-
 app.get('/previewFeed', sourcesModule.routePreviewFeed);
 
 app.get('/getItems', (request, response) => {
-  // Gets hit from the front-end
-
   let subscriptions = JSON.parse(request.query.subscriptions);
   let after = [];
   console.log(`${request.query.after} <== req.query.after\n\n`);

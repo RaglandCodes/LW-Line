@@ -12,6 +12,24 @@ const fs = require('fs');
 const path = require('path');
 
 // --------------- functions ----------
+
+function addNewFeed(newFeed) {
+  newFeed = {
+    ...newFeed,
+    source: 'UN_KNOWN'
+  };
+
+  console.log(`${JSON.stringify(newFeed, null, 2)} <== newFeed in DB\n`);
+
+  client
+    .query(q.Create(q.Collection('feeds'), { data: newFeed }))
+    .then(ret => {
+      //console.log(`${JSON.stringify(ret, null, 2)} <== ret \n`);
+    })
+    .catch(e => {
+      console.error(e);
+    });
+}
 function addMultiple(newPosts) {
   // Convert date to Fauna date format
 
@@ -252,6 +270,7 @@ async function getFeedItems(feedNames, { ...options } = {}) {
           link: item['data']['link'],
           image: item['data']['image'],
           description: item['data']['description'],
+          contentSnippetParagraphs: item['data']['contentSnippetParagraphs'],
           metaDescription: item['data']['metaDescription'],
           ampURL: item['data']['ampURL']
         })),
@@ -344,13 +363,12 @@ async function getLastItemDate(feed) {
         return new Date('December 17, 2000 03:24:00');
       } else {
         return ret['data'][0]['data']['date'];
-        // console.log(
-        //   `${ret['data'][0]['data']['date']} <== Last date for ${source} \n\n`
-        // );
       }
     })
     .catch(getLastItemError => {
-      console.log(`${getLastItemError} <== getLastItemError for ${source}\n`);
+      console.error(getLastItemError);
+      console.warn(`Error for ${source}`);
+
       throw new Error(`Couldn't get last item date for ${source}`);
     });
   // if nothing for that source is found in the databse, return the current date
@@ -394,5 +412,6 @@ module.exports = {
   getSourceInfo: getSourceInfo,
   searchFeedsByName: searchFeedsByName,
   yieldAllFeeds: yieldAllFeeds,
-  searchFeedsByFeedLink: searchFeedsByFeedLink
+  searchFeedsByFeedLink: searchFeedsByFeedLink,
+  addNewFeed: addNewFeed
 };

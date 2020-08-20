@@ -453,10 +453,34 @@ async function routePreviewFeed(request, response) {
 
   after = feedItems.after;
   feedItems = feedItems.data;
+
   feedInfo = feedInfo.data[0].data;
 
   sourceName = feedInfo.source;
-  let sourceInfo = await db.getSourceInfo(sourceName);
+
+  const respondWithUnkownSource = () => {
+    // used when everything other than source is available
+    response.send({
+      status: 'OK',
+      data: { sourceInfo: 'UN_KNOWN', feed: { items: feedItems, after: after } }
+    });
+  };
+
+  if (sourceName === 'UN_KNOWN') {
+    respondWithUnkownSource();
+    return;
+  }
+
+  let sourceInfo = await db.getSourceInfo(sourceName).catch(e => {
+    console.error(e);
+    respondWithUnkownSource();
+    return;
+  });
+
+  if (sourceInfo.data.length === 0) {
+    respondWithUnkownSource();
+    return;
+  }
   sourceInfo = sourceInfo.data[0].data;
 
   response.send({

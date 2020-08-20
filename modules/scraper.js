@@ -6,6 +6,7 @@ const db = require('./database');
 const fs = require('fs');
 const path = require('path');
 const metafetch = require('metafetch');
+const nanoid = require('nanoid');
 
 // --------------- functions ----------
 
@@ -48,11 +49,11 @@ function getMeta(item) {
 async function routeAddFeedFromLink(request, response) {
   let feedLink = request.query.feedLink;
   let userId = request.query.userId;
-
+  let customFeedExists = false;
   if (!userId || userId === 'admin') {
     response.send({
       status: 'ERROR',
-      body: 'Bad auth'
+      data: 'Bad auth'
     });
     return;
   }
@@ -60,7 +61,7 @@ async function routeAddFeedFromLink(request, response) {
   let existingFeed = await db.searchFeedsByFeedLink(feedLink).catch(e => {
     response.send({
       status: 'ERROR',
-      body: 'DB Error'
+      data: 'DB Error'
     });
 
     return;
@@ -68,11 +69,15 @@ async function routeAddFeedFromLink(request, response) {
 
   if (existingFeed.data.length) {
     // TODO check if created by admin
-    response.send({
-      status: 'ERROR',
-      body: 'Already Exists'
-    });
-    return;
+    existingFeed = existingFeed.data[0].data;
+    if (existingFeed.createdBy.indexOf('admin') > -1) {
+      response.send({
+        status: 'ERROR',
+        data: 'Already Exists'
+      });
+      return;
+    }
+    customFeedExists = true;
   }
 
   let parser = new Parser();
@@ -80,7 +85,7 @@ async function routeAddFeedFromLink(request, response) {
     console.error(feedDataError);
     response.send({
       status: 'ERROR',
-      body: `Couldn't scrape that feed`
+      data: `Couldn't scrape that feed`
     });
     return;
   });
@@ -98,37 +103,43 @@ async function routeAddFeedFromLink(request, response) {
   let feedItems = feedData.items.map(item => ({
     title: item.title,
     contentSnippet: item.contentSnippet,
+    contentSnippetParagraphs: snippetToParagraphs(item.contentSnippet),
     topics: item.categories ? [...item.categories] : [],
     feed: newFeed.name,
     date: new Date(item.pubDate).toISOString(),
+    source: 'UN_KNOWN',
     link: item.link
   }));
 
   if (feedItems.length === 0) {
     response.send({
       status: 'ERROR',
-      body: `Couldn't scrape that feed`
+      data: `Couldn't scrape that feed`
     });
     return;
   }
 
+  response.send({ status: 'OK', data: newFeed });
+
+  let lastItemDate = await db.getLastItemDate(newFeed.name);
+  feedItems = feedItems.filter(item => {
+    return new Date(item.pubDate) > new Date(lastItemDate);
+  });
+
   let feedItemsWithMetaData = await Promise.all(feedItems.map(item => getMeta(item)));
 
-  // db.addMultiple(feedItemsWithMetaData);
+  console.log(`${customFeedExists} <== customFeedExists\n\n`);
 
-  response.send(newFeed);
-}
-
-async function getDataFromLink(feedLink) {
-  console.log('noooo');
-  // let parser = new Parser();
-  // let feedData;
-  // console.log(`${feedLink} <== feedLink`);
-  // feedData = await parser.parseURL(feedLink).catch(feedDataError => {
-  //   console.log(`${feedDataError} <== feedDataError`);
-  //   return [];
-  // });
-  // return feedData;
+  if (!customFeedExists) {
+    db.addNewFeed(newFeed);
+  } else {
+    console.warn('TODO update the feed createdBy array');
+  }
+  if (feedItems.length > 0) {
+    db.addMultiple(feedItemsWithMetaData);
+  } else {
+    console.log('Not adding anything new');
+  }
 }
 
 async function routeUpdateAllFeeds(request, response) {
@@ -152,7 +163,8 @@ async function routeUpdateAllFeeds(request, response) {
             }
           })
           .catch(cronError => {
-            console.log(`${cronError} <== cronError \n`);
+            console.error(cronError);
+            console.warn(`Error for ${feed.name}`);
           });
       }
     } else {
@@ -160,6 +172,30 @@ async function routeUpdateAllFeeds(request, response) {
     }
   }
   console.log('over');
+}
+
+function snippetToParagraphs(snippet) {
+  if (!snippet) {
+    return [];
+  }
+  if (snippet.length === 0) {
+    return [];
+  }
+
+  // split the text into paragraphs
+  paragraphs = snippet.split('\n');
+
+  //remove empty paragraphs
+  paragraphs = paragraphs.map(p => p.trim());
+  paragraphs = paragraphs.filter(p => p.length > 1);
+
+  // set unique key for React
+  paragraphs = paragraphs.map(p => ({
+    key: nanoid(5),
+    content: p
+  }));
+
+  return paragraphs;
 }
 
 async function getNewItems(feed) {
@@ -188,6 +224,7 @@ async function getNewItems(feed) {
   let scrappedItems = newData.map(item => ({
     title: item.title,
     contentSnippet: item.contentSnippet,
+    contentSnippetParagraphs: snippetToParagraphs(item.contentSnippet),
     topics: item.categories ? [...item.categories, ...feed.topics] : [...feed.topics],
     source: feed.source,
     feed: feed.name,
@@ -195,16 +232,15 @@ async function getNewItems(feed) {
     link: item.link
   }));
 
-  let scrappedItemsWithMetaData = await Promise.all(scrappedItems.map(item => getMeta(item)));
+  //return [];
 
-  //   return [];
+  let scrappedItemsWithMetaData = await Promise.all(scrappedItems.map(item => getMeta(item)));
 
   return scrappedItemsWithMetaData;
 } // end of function getNewItems
 
 module.exports = {
   getNewItems: getNewItems,
-  getDataFromLink: getDataFromLink,
   routeUpdateAllFeeds: routeUpdateAllFeeds,
   routeAddFeedFromLink: routeAddFeedFromLink
 };
