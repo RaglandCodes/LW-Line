@@ -8,9 +8,6 @@ let client = new faunadb.Client({
   secret: process.env.FAUNA_SECRET
 });
 
-const fs = require('fs');
-const path = require('path');
-
 // --------------- functions ----------
 
 function addNewFeed(newFeed) {
@@ -215,7 +212,7 @@ async function searchFeedsByName(searchQuery) {
 
 async function getFeedItems(feedNames, { ...options } = {}) {
   const defaultOptions = {
-    size: 9,
+    size: 19,
     after: []
   };
 
@@ -246,7 +243,7 @@ async function getFeedItems(feedNames, { ...options } = {}) {
     .then(ret => JSON.parse(JSON.stringify(ret)))
     .then(ret => {
       //console.log(`${JSON.stringify(ret)} <== getItems query ret\n\n`);
-      //fs.writeFileSync(path.join(__dirname, './aa.json'), JSON.stringify(ret));
+
       //console.log(`${ret.data.length} <== ret.data.length\n\n ==> ${feedName}`);
 
       if (ret.data.length === 0) {
@@ -308,7 +305,7 @@ async function getItems(sources, after, options = {}) {
     .then(ret => JSON.parse(JSON.stringify(ret)))
     .then(ret => {
       //console.log(`${JSON.stringify(ret)} <== getItems query ret\n\n`);
-      //fs.writeFileSync(path.join(__dirname, './aa.json'), JSON.stringify(ret));
+
       //   console.log(`${ret.data.length} <== ret.data.length\n\n ==> ${sources}`);
 
       if (ret.data.length === 0) {

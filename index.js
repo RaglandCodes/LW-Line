@@ -62,7 +62,12 @@ app.get('/getItems', (request, response) => {
   }
   db.getFeedItems(subscriptions, { after: after })
     .then(responseData => {
-      response.send({ status: 'OK', data: responseData });
+      let responseDataWithoutRepetition = {
+        ...responseData,
+        data: scrapper.removeRepeatingItems(responseData.data)
+      };
+
+      response.send({ status: 'OK', data: responseDataWithoutRepetition });
     })
     .catch(error => {
       console.log(`${error} <== error\n\n`);

@@ -142,6 +142,42 @@ async function routeAddFeedFromLink(request, response) {
   }
 }
 
+function removeRepeatingItems(items) {
+  // !! this is a patch !!
+  // TODO fix the problem and remove this funciton
+
+  // returns an array with unique titles
+  let totalItemsCount = items.length;
+  console.log(`${totalItemsCount} <== totalItemsCount\n\n`);
+
+  let itemTitles = items.map(i => i.title);
+  let uniqueItemTitles = new Set(itemTitles);
+
+  let uniqueItemsCount = uniqueItemTitles.size;
+  console.log(`${uniqueItemsCount} <== uniqueItemsCount\n\n`);
+
+  if (totalItemsCount === uniqueItemsCount) {
+    // nothing to remove
+    return items;
+  }
+
+  console.log(`${JSON.stringify(itemTitles, null, 2)} <== itemTitles \n`);
+
+  items = items.filter(item => {
+    if (uniqueItemTitles.has(item.title)) {
+      uniqueItemTitles.delete(item.title);
+      return true;
+    }
+    return false;
+  });
+
+  itemTitles = items.map(i => i.title);
+  console.log(`${JSON.stringify(itemTitles, null, 2)} <== itemTitles after removings \n`);
+
+  console.log(`${items.length} <== items.length after removing\n\n`);
+  return items;
+}
+
 async function routeUpdateAllFeeds(request, response) {
   response.end('OK');
 
@@ -157,7 +193,7 @@ async function routeUpdateAllFeeds(request, response) {
           .then(newItems => {
             console.count('Finished scrapping');
             if (newItems.length === 0) {
-              console.log(`N0t adding anything for ${feed.name}`);
+              console.warn(`N0t adding anything for ${feed.name}`);
             } else {
               db.addMultiple(newItems);
             }
@@ -183,7 +219,7 @@ function snippetToParagraphs(snippet) {
   }
 
   // split the text into paragraphs
-  paragraphs = snippet.split('\n');
+  let paragraphs = snippet.split('\n');
 
   //remove empty paragraphs
   paragraphs = paragraphs.map(p => p.trim());
@@ -242,5 +278,6 @@ async function getNewItems(feed) {
 module.exports = {
   getNewItems: getNewItems,
   routeUpdateAllFeeds: routeUpdateAllFeeds,
-  routeAddFeedFromLink: routeAddFeedFromLink
+  routeAddFeedFromLink: routeAddFeedFromLink,
+  removeRepeatingItems: removeRepeatingItems
 };

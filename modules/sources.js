@@ -3,7 +3,7 @@
 // const fs = require('fs');
 // const path = require('path');
 const db = require('./database');
-
+const scrapper = require('./scraper');
 const sources = [
   {
     name: 'The Verge',
@@ -453,6 +453,7 @@ async function routePreviewFeed(request, response) {
 
   after = feedItems.after;
   feedItems = feedItems.data;
+  feedItems = scrapper.removeRepeatingItems(feedItems);
 
   feedInfo = feedInfo.data[0].data;
 
