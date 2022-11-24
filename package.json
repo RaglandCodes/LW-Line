@@ -23,7 +23,7 @@
     "chai": "*",
     "chai-http": "^4.3.0",
     "mocha": "*",
-    "nodemon": "^2.0.4",
+    "nodemon": "^2.0.20",
     "nyc": "^15.1.0"
   },
   "engines": {
